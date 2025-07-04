@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.oopsw</groupId>
-    <artifactId>account-service</artifactId>
+    <artifactId>exercise-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>account-service</name>
-    <description>account-service</description>
+    <name>exercise-service</name>
+    <description>exercise-service</description>
     <url/>
     <licenses>
         <license/>
@@ -31,6 +31,10 @@
         <spring-cloud.version>2025.0.0</spring-cloud.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-reactor-netty</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.h2database</groupId>

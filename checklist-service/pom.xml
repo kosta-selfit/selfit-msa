@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.oopsw</groupId>
-    <artifactId>account-service</artifactId>
+    <artifactId>checklist-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>account-service</name>
-    <description>account-service</description>
+    <name>checklist-service</name>
+    <description>checklist-service</description>
     <url/>
     <licenses>
         <license/>
@@ -57,13 +57,13 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
-            <version>3.2.2</version>
+            <version>3.2.0</version>
         </dependency>
 
         <dependency>
