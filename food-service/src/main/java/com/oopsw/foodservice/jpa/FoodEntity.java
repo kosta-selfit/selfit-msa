@@ -36,7 +36,7 @@ public class FoodEntity implements Serializable {
 	@Column(nullable = false)
 	private Float intakeKcal;
 	@Column(nullable = false)
-	private int unitKcal;
+	private Integer unitKcal;
 
 	@Column(nullable = false)
 	private String memberId;
