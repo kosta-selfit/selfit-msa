@@ -1,5 +1,7 @@
 package com.oopsw.accountservice.controller;
 
+import org.apache.catalina.mapper.Mapper;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.oopsw.accountservice.dto.MemberDto;
 import com.oopsw.accountservice.service.AccountService;
 import com.oopsw.accountservice.vo.request.ReqAddMember;
 import com.oopsw.accountservice.vo.request.ReqCheckEmail;
@@ -35,12 +38,14 @@ public class AccountController {
 
 	@GetMapping("/member/{memberId}")
 	public ResponseEntity<ResGetMember> getMember(@PathVariable String memberId) {
+
 		return ResponseEntity.ok(null);
 	}
 
 	@PostMapping("/member")
 	public ResponseEntity<ResMessage> addMember(@RequestBody ReqAddMember reqAddMember) {
-		return ResponseEntity.ok(null);
+		accountService.addMember(new ModelMapper().map(reqAddMember, MemberDto.class));
+		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
 	@PutMapping("/member/{memberId}")

@@ -1,6 +1,8 @@
 package com.oopsw.accountservice.service;
 
-public interface AccountService {
+import com.oopsw.accountservice.dto.MemberDto;
 
+public interface AccountService {
+	void addMember(MemberDto memberDto);
 
 }
