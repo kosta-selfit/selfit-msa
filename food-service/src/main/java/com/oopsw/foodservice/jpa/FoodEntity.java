@@ -26,7 +26,7 @@ public class FoodEntity implements Serializable {
 	private Long id;
 
 	@Column(nullable = false, unique = true)
-	private String foodNoteId;
+	private String foodId;
 	@Column(nullable = false)
 	private Date intakeDate;
 	@Column(nullable = false)

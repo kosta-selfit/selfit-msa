@@ -1,4 +1,4 @@
 package com.oopsw.foodservice.service;
 
-public class FoodServiceImpl {
+public class FoodServiceImpl implements FoodService {
 }
