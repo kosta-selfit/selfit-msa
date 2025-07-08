@@ -28,10 +28,11 @@ public class FoodController {
 		return "test";
 	}
 
-	@PostMapping("/api/food-service/member/{memberId}")
+	@PostMapping("/member/{memberId}")
 	public ResponseEntity<ResMessage> addFood(@PathVariable("memberId") String memberId, @RequestBody ReqAddFood reqAddFood) {
-		FoodDto foodDto = foodService.addFood(new ModelMapper().map(reqAddFood, FoodDto.class));
+		FoodDto foodDto = new ModelMapper().map(reqAddFood, FoodDto.class);
 		foodDto.setMemberId(memberId);
+		foodService.addFood(foodDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 

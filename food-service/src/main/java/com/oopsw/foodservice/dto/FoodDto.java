@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class FoodDto {
+	private Long id;
 	private String foodId;
 	private Date intakeDate;
 	private String foodName;
