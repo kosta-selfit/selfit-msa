@@ -2,6 +2,8 @@ package com.oopsw.accountservice.jpa;
 
 import java.util.Date;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +25,7 @@ public class MemberEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Long id;
 
 	@Column(name = "member_id", unique = true, nullable = false)
 	private String memberId;
@@ -55,7 +57,8 @@ public class MemberEntity {
 	@Column(name = "goal", length = 5)
 	private String goal;
 
-	@Column(name = "join_date", length = 30)
+	@Column(name = "join_date", nullable = false, updatable = false, insertable = false)
+	@ColumnDefault(value = "CURRENT_TIMESTAMP")
 	private Date joinDate;
 
 	@Column(name = "member_type", length = 30)
