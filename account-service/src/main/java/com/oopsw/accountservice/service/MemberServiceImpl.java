@@ -21,8 +21,6 @@ public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepository memberRepository;
 	private final BCryptPasswordEncoder passwordEncoder;
-	private final EntityManager entityManager;
-	private final RegexpURLValidator regexpURLValidator;
 
 	@Override
 	public void addMember(MemberDto memberDto) {
@@ -59,6 +57,7 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	@Transactional
 	public void removeMember(String memberId) {
 		memberRepository.deleteByMemberId(memberId);
 	}
@@ -76,7 +75,7 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public Boolean checkPw(MemberDto memberDto) {
 		MemberEntity memberEntity = memberRepository.findByMemberId(memberDto.getMemberId());
-		return memberEntity.getPw().equals(passwordEncoder.encode(memberDto.getPw()));
+		return passwordEncoder.matches(memberDto.getPw(), memberEntity.getPw());
 	}
 
 }
