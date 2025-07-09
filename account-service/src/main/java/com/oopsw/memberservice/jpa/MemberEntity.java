@@ -1,4 +1,4 @@
-package com.oopsw.accountservice.jpa;
+package com.oopsw.memberservice.jpa;
 
 import java.util.Date;
 

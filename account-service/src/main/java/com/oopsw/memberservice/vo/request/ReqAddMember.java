@@ -1,16 +1,11 @@
-package com.oopsw.accountservice.dto;
+package com.oopsw.memberservice.vo.request;
 
 import java.util.Date;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-public class MemberDto {
-	private Long id;
-	private String memberId;
+public class ReqAddMember {
 	private String email;
 	private String pw;
 	private String name;
@@ -20,7 +15,5 @@ public class MemberDto {
 	private Float height;
 	private Float weight;
 	private String goal;
-	private Date joinDate;
 	private String memberType;
-	private String profileImg;
 }

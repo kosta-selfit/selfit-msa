@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.oopsw</groupId>
-    <artifactId>account-service</artifactId>
+    <artifactId>member-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>account-service</name>
-    <description>account-service</description>
+    <name>member-service</name>
+    <description>member-service</description>
     <url/>
     <licenses>
         <license/>

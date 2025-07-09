@@ -1,13 +1,12 @@
-package com.oopsw.accountservice.vo.request;
+package com.oopsw.memberservice.vo.response;
 
 import java.util.Date;
 
 import lombok.Data;
 
 @Data
-public class ReqAddMember {
+public class ResGetMember {
 	private String email;
-	private String pw;
 	private String name;
 	private String nickname;
 	private String gender;
@@ -15,5 +14,4 @@ public class ReqAddMember {
 	private Float height;
 	private Float weight;
 	private String goal;
-	private String memberType;
 }
