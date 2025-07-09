@@ -2,6 +2,7 @@ package com.oopsw.foodservice.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.oopsw.foodservice.dto.FoodDto;
 import com.oopsw.foodservice.jpa.FoodEntity;
@@ -24,5 +25,15 @@ public class FoodServiceImpl implements FoodService {
 		// 3. 저장
 		foodRepository.save(foodEntity);
 		return foodDto;
+	}
+
+	@Override
+	@Transactional
+	public void removeFood(FoodDto foodDto) {
+		int foodEntity = foodRepository.deleteByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
+
+		if(foodEntity == 0) {
+			throw new IllegalArgumentException("Invalid memberId or foodId");
+		}
 	}
 }
