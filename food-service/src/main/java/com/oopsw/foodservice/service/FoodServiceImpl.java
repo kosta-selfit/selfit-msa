@@ -20,10 +20,22 @@ public class FoodServiceImpl implements FoodService {
 	private final ModelMapper modelMapper;
 
 	@Override
+	public FoodDto getIntakeKcal(FoodDto foodDto) {
+		List<FoodEntity> foodEntities = foodRepository.findByMemberIdAndIntakeDate(foodDto.getMemberId(), foodDto.getIntakeDate());
+		float intakeKcalSum = 0f;
+		for (FoodEntity foodEntity : foodEntities) {
+			if(foodEntity.getIntakeKcal() != null){
+				intakeKcalSum += foodEntity.getIntakeKcal();
+			}
+		}
+		return FoodDto.builder().intakeKcalSum(intakeKcalSum).build();
+	}
+
+	@Override
 	public List<FoodDto> getFood(FoodDto foodDto) {
-		List<FoodEntity> foodEntityList = foodRepository.findByMemberIdAndIntakeDate(foodDto.getMemberId(), foodDto.getIntakeDate());
+		List<FoodEntity> foodEntities = foodRepository.findByMemberIdAndIntakeDate(foodDto.getMemberId(), foodDto.getIntakeDate());
 		List<FoodDto> foodDtoList = new ArrayList<>();
-		for (FoodEntity foodEntity : foodEntityList) {
+		for (FoodEntity foodEntity : foodEntities) {
 			foodDtoList.add(modelMapper.map(foodEntity, FoodDto.class));
 		}
 		return foodDtoList;

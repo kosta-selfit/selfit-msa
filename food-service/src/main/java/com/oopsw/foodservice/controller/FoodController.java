@@ -19,9 +19,11 @@ import com.oopsw.foodservice.dto.FoodDto;
 import com.oopsw.foodservice.service.FoodService;
 import com.oopsw.foodservice.vo.request.ReqAddFood;
 import com.oopsw.foodservice.vo.request.ReqGetFood;
+import com.oopsw.foodservice.vo.request.ReqGetIntakeKcal;
 import com.oopsw.foodservice.vo.request.ReqRemoveFood;
 import com.oopsw.foodservice.vo.request.ReqSetFood;
 import com.oopsw.foodservice.vo.response.ResGetFood;
+import com.oopsw.foodservice.vo.response.ResGetIntakeKcal;
 import com.oopsw.foodservice.vo.response.ResMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,15 @@ public class FoodController {
 	public String test() {
 		return "test";
 	}
+
+	@PostMapping("/kcal/member/{memberId}")
+	public ResponseEntity<ResGetIntakeKcal> getIntakeKcal(@PathVariable String memberId, @RequestBody ReqGetIntakeKcal reqGetIntakeKcal) {
+		FoodDto foodDto = modelMapper.map(reqGetIntakeKcal, FoodDto.class);
+		foodDto.setMemberId(memberId);
+		ResGetIntakeKcal result = modelMapper.map(foodService.getIntakeKcal(foodDto), ResGetIntakeKcal.class);
+		return ResponseEntity.ok(result);
+	}
+
 
 	@PostMapping("/foods/member/{memberId}")
 	public ResponseEntity<List<ResGetFood>> getFood(@PathVariable("memberId") String memberId, @RequestBody ReqGetFood reqGetFood) {
