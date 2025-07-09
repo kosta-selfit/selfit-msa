@@ -1,4 +1,4 @@
-package com.oopsw.boardservice.vo.request;
+package com.oopsw.boardservice.vo.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,11 +7,10 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class ReqAddBoard {
+@NoArgsConstructor
+public class ResGetBoards {
 	private String boardTitle;
-	private String boardContent;
 	private String categoryName;
-	private String boardImg;
+	private int totalCount;
 }

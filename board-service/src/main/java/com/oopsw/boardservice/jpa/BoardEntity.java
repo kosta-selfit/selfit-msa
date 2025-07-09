@@ -25,17 +25,17 @@ public class BoardEntity {
 	private String boardContent;
 
 	@Column(nullable = false)
-	private String categoryId;
-
-	@Column(nullable = false)
 	private String categoryName;
 
-	@Column(nullable = false)
+	@Column()
 	private String boardImg;
 
 	@Column(nullable = false, updatable = false, insertable = false)
 	@ColumnDefault(value = "CURRENT_TIMESTAMP")
 	private String createdDate;
+
+	@Column(nullable = false)
+	private int viewCount;
 
 	@Column(nullable = false, unique = true)
 	private String boardId;

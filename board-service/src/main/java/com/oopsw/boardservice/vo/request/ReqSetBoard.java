@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqAddBoard {
+public class ReqSetBoard {
+	private String boardId;
 	private String boardTitle;
 	private String boardContent;
 	private String categoryName;
