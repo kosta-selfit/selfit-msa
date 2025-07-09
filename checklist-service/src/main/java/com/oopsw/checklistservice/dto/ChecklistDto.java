@@ -1,5 +1,6 @@
 package com.oopsw.checklistservice.dto;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;

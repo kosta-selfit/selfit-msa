@@ -1,11 +1,11 @@
 package com.oopsw.checklistservice.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.hibernate.annotations.Check;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.oopsw.checklistservice.dto.ChecklistDto;
 import com.oopsw.checklistservice.service.ChecklistService;
-import com.oopsw.checklistservice.vo.request.ReqAddCheckItem;
 import com.oopsw.checklistservice.vo.request.ReqAddCheckList;
 import com.oopsw.checklistservice.vo.request.ReqGetChecklist;
 import com.oopsw.checklistservice.vo.request.ReqRemoveChecklist;
@@ -33,31 +32,49 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/checklist-service")
 public class ChecklistController {
 	private final ChecklistService checklistService;
+	private final ModelMapper modelMapper;
 
 	@GetMapping("/api-test")
 	public String test() {
 		return "test";
 	}
 
-	@PostMapping("/{checklistId}/member/{memberId}")
-	public ResponseEntity<List<ResGetChecklist>> getCheckList (@PathVariable String memberId, @RequestBody ReqGetChecklist reqGetChecklist) {
+	@PostMapping("/member/{memberId}")
+	public ResponseEntity<List<ResGetChecklist>> getCheckList(@PathVariable String memberId,
+		@RequestBody ReqGetChecklist reqGetChecklist) {
+		ChecklistDto checklistDto = modelMapper.map(reqGetChecklist, ChecklistDto.class);
+		checklistDto.setMemberId(memberId);
+		List<ChecklistDto> checklistDtos = checklistService.getChecklists(checklistDto);
+		List<ResGetChecklist> response = new ArrayList<>();
+		for (ChecklistDto dto : checklistDtos) {
+			ResGetChecklist res = modelMapper.map(dto, ResGetChecklist.class);
+			response.add(res);
+		}
 
-		return ResponseEntity.ok(null);
+		return ResponseEntity.ok(response);
 	}
+
 	@PutMapping("/member/{memberId}")
-	public ResponseEntity<ResMessage> setCheckItem (@PathVariable String memberId, @RequestBody ReqSetCheckItem reqSetCheckItem) {
-
-		return  ResponseEntity.ok(null);
+	public ResponseEntity<ResMessage> setCheckItem(@PathVariable String memberId,
+		@RequestBody ReqSetCheckItem reqSetCheckItem) {
+		ChecklistDto checklistDto = modelMapper.map(reqSetCheckItem, ChecklistDto.class);
+		checklistDto.setMemberId(memberId);
+		checklistService.setCheckItem(checklistDto);
+		return ResponseEntity.ok(new ResMessage("success"));
 	}
+
 	@PutMapping("/item/checklist/member/{memberId}")
-	public ResponseEntity<ResMessage> setIsCheckItem(@PathVariable String memberId, @RequestBody ReqSetIsCheckItem reqSetIsCheckItem) {
-		ChecklistDto checklistDto = new ModelMapper().map(reqSetIsCheckItem, ChecklistDto.class);
+	public ResponseEntity<ResMessage> setIsCheckItem(@PathVariable String memberId,
+		@RequestBody ReqSetIsCheckItem reqSetIsCheckItem) {
+		ChecklistDto checklistDto = modelMapper.map(reqSetIsCheckItem, ChecklistDto.class);
 		checklistDto.setMemberId(memberId);
 		checklistService.setIsCheckItem(checklistDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
+
 	@DeleteMapping("/item/checklist/member/{memberId}")
-	public ResponseEntity<ResMessage> removeChecklist (@PathVariable String memberId, @RequestBody ReqRemoveChecklist reqRemoveChecklist) {
+	public ResponseEntity<ResMessage> removeChecklist(@PathVariable String memberId,
+		@RequestBody ReqRemoveChecklist reqRemoveChecklist) {
 		ChecklistDto checklistDto = ChecklistDto.builder().
 			checklistId(reqRemoveChecklist.getChecklistId()).
 			memberId(memberId).
@@ -65,9 +82,11 @@ public class ChecklistController {
 		checklistService.removeChecklist(checklistDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
-	@PostMapping("/member/{memberId}")
-	public ResponseEntity<ResMessage> addChecklist (@PathVariable String memberId, @RequestBody ReqAddCheckList reqAddCheckList) {
-		ChecklistDto checkListDto = new ModelMapper().map(reqAddCheckList, ChecklistDto.class);
+
+	@PostMapping("/item/member/{memberId}")
+	public ResponseEntity<ResMessage> addChecklist(@PathVariable String memberId,
+		@RequestBody ReqAddCheckList reqAddCheckList) {
+		ChecklistDto checkListDto = modelMapper.map(reqAddCheckList, ChecklistDto.class);
 		checkListDto.setMemberId(memberId);
 		checklistService.addChecklist(checkListDto);
 		return ResponseEntity.ok(new ResMessage("success"));

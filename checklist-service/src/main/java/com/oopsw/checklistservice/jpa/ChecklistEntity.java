@@ -1,5 +1,6 @@
 package com.oopsw.checklistservice.jpa;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import org.hibernate.annotations.ColumnDefault;
@@ -20,8 +21,7 @@ public class ChecklistEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(updatable = false, insertable = false)
-	@ColumnDefault(value = "CURRENT_TIMESTAMP")
+	@Column(nullable = false)
 	private Date checklistDate;
 	@Column(nullable = false)
 	private Integer isChecked;
