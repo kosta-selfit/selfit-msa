@@ -1,4 +1,4 @@
-package com.oopsw.accountservice.vo.response;
+package com.oopsw.memberservice.vo.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

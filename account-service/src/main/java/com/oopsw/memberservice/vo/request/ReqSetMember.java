@@ -1,4 +1,4 @@
-package com.oopsw.accountservice.vo.request;
+package com.oopsw.memberservice.vo.request;
 
 import java.util.Date;
 

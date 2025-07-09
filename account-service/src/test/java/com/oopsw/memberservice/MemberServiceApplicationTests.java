@@ -1,10 +1,10 @@
-package com.oopsw.accountservice;
+package com.oopsw.memberservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AccountServiceApplicationTests {
+class MemberServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

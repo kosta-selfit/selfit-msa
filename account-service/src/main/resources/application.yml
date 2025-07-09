@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: account-service
+    name: member-service
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://127.0.0.1:3306/mydb?characterEncoding=UTF-8

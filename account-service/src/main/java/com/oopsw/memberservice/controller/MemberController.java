@@ -1,4 +1,4 @@
-package com.oopsw.accountservice.controller;
+package com.oopsw.memberservice.controller;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.oopsw.accountservice.dto.MemberDto;
-import com.oopsw.accountservice.service.MemberService;
-import com.oopsw.accountservice.vo.request.ReqAddMember;
-import com.oopsw.accountservice.vo.request.ReqCheckEmail;
-import com.oopsw.accountservice.vo.request.ReqCheckNickname;
-import com.oopsw.accountservice.vo.request.ReqCheckPw;
-import com.oopsw.accountservice.vo.request.ReqSetMember;
-import com.oopsw.accountservice.vo.response.ResGetMember;
-import com.oopsw.accountservice.vo.response.ResMessage;
+import com.oopsw.memberservice.dto.MemberDto;
+import com.oopsw.memberservice.service.MemberService;
+import com.oopsw.memberservice.vo.request.ReqAddMember;
+import com.oopsw.memberservice.vo.request.ReqCheckEmail;
+import com.oopsw.memberservice.vo.request.ReqCheckNickname;
+import com.oopsw.memberservice.vo.request.ReqCheckPw;
+import com.oopsw.memberservice.vo.request.ReqSetMember;
+import com.oopsw.memberservice.vo.response.ResGetMember;
+import com.oopsw.memberservice.vo.response.ResMessage;
 
 import lombok.RequiredArgsConstructor;
 

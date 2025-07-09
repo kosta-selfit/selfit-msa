@@ -1,18 +1,16 @@
-package com.oopsw.accountservice.service;
+package com.oopsw.memberservice.service;
 
 import java.util.UUID;
 
-import org.hibernate.validator.constraintvalidators.RegexpURLValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.oopsw.accountservice.dto.MemberDto;
-import com.oopsw.accountservice.jpa.MemberEntity;
-import com.oopsw.accountservice.jpa.MemberRepository;
+import com.oopsw.memberservice.dto.MemberDto;
+import com.oopsw.memberservice.jpa.MemberEntity;
+import com.oopsw.memberservice.jpa.MemberRepository;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 
 @Service
