@@ -9,6 +9,4 @@ public class ReqGetExerciseOpenSearch {
 	private String keyword;
 	private int pageNo;
 	private int numOfRows;
-
-
 }
