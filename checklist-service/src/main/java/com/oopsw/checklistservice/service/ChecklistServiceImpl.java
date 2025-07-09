@@ -80,7 +80,6 @@ public class ChecklistServiceImpl implements ChecklistService {
 		int count = (checklistRepository.findAll().size()) + 1;
 		checklistDto.setChecklistId(String.format("Ch%03d", count));
 		checklistRepository.save(modelMapper.map(checklistDto, ChecklistEntity.class));
-		checklistRepository.findById(1L);
 	}
 }
 
