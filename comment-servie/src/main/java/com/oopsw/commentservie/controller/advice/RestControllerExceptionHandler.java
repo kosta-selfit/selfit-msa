@@ -1,4 +1,4 @@
-package com.oopsw.memberservice.controller.advice;
+package com.oopsw.commentservie.controller.advice;
 
 import java.net.BindException;
 import java.sql.SQLSyntaxErrorException;
