@@ -2,7 +2,6 @@ package com.oopsw.checklistservice.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
@@ -75,10 +74,8 @@ public class ChecklistController {
 	@DeleteMapping("/item/checklist/member/{memberId}")
 	public ResponseEntity<ResMessage> removeChecklist(@PathVariable String memberId,
 		@RequestBody ReqRemoveChecklist reqRemoveChecklist) {
-		ChecklistDto checklistDto = ChecklistDto.builder().
-			checklistId(reqRemoveChecklist.getChecklistId()).
-			memberId(memberId).
-			build();
+		ChecklistDto checklistDto = modelMapper.map(reqRemoveChecklist, ChecklistDto.class);
+		checklistDto.setMemberId(memberId);
 		checklistService.removeChecklist(checklistDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}

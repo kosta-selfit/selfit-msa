@@ -3,7 +3,6 @@ package com.oopsw.checklistservice.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -39,8 +38,6 @@ public class ChecklistServiceImpl implements ChecklistService {
 		System.out.println(checklistDto.getChecklistDate());
 		List<ChecklistEntity> entities = checklistRepository
 			.findAllByMemberIdAndChecklistDate(checklistDto.getMemberId(), checklistDto.getChecklistDate());
-
-
 
 		List<ChecklistDto> result = new ArrayList<>();
 		for (ChecklistEntity entity : entities) {

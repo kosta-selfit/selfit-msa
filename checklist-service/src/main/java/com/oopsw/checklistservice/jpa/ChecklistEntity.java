@@ -1,9 +1,6 @@
 package com.oopsw.checklistservice.jpa;
 
-import java.time.LocalDate;
 import java.util.Date;
-
-import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +12,7 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="checklist")
+@Table(name = "checklist")
 public class ChecklistEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
