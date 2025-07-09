@@ -3,15 +3,18 @@ package com.oopsw.exerciseservice.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import com.oopsw.exerciseservice.dto.ExerciseDto;
 import com.oopsw.exerciseservice.jpa.ExerciseEntity;
 import com.oopsw.exerciseservice.jpa.ExerciseRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -23,8 +26,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 	private final ExerciseRepository exerciseRepository;
 
 	@Override
-	public boolean addExercise(ExerciseDto exerciseDto) {
-		log.info("Adding exerciseDto " + exerciseDto.getExerciseName());
+	public void addExercise(ExerciseDto exerciseDto) {
 		// 소모 칼로리 계산(Member에서 Weight 가져와야 함.
 		float kcal = 70  //dashboardRepository.getWeight(exercise.getExerciseNoteId())
 			* exerciseDto.getMet()
@@ -40,13 +42,12 @@ public class ExerciseServiceImpl implements ExerciseService {
 			.met(exerciseDto.getMet())
 			.memberId(exerciseDto.getMemberId())
 			.exerciseDate(exerciseDto.getExerciseDate())
-			.exerciseId(String.format("e%03d", count))
+			.exerciseId(String.format("e%04d", count))
 			.exerciseKcal(kcal)
 			.build();
 
 		// JPA 저장
 		exerciseRepository.save(exerciseEntity);
-		return true;
 	}
 
 	@Override
@@ -69,5 +70,28 @@ public class ExerciseServiceImpl implements ExerciseService {
 		return exerciseDtos;
 	}
 
+	@Transactional
+	public void removeExercise(ExerciseDto exerciseDto) {
+		if (exerciseRepository.existsByMemberIdAndExerciseId(exerciseDto.getMemberId(), exerciseDto.getExerciseId())) {
+			exerciseRepository.deleteByMemberIdAndExerciseId(exerciseDto.getMemberId(), exerciseDto.getExerciseId());
+		}
+	}
 
+
+	public void setExerciseMin(ExerciseDto exerciseDto) {
+		ExerciseEntity exerciseEntity = ExerciseEntity.builder()
+			.memberId(exerciseDto.getMemberId())
+			.exerciseId(exerciseDto.getExerciseId())
+			.build();
+		ExerciseEntity exercise = exerciseRepository.findByExerciseId(exerciseEntity.getExerciseId());
+
+		exercise.setExerciseMin(exerciseDto.getNewMin());
+
+		float weight = 70.0f; // member weight
+		float met = exercise.getMet();
+		float kcal = weight * met * exerciseDto.getNewMin() / 60f;
+
+		exercise.setExerciseKcal(kcal);
+		exerciseRepository.save(exercise);
+	}
 }

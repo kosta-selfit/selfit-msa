@@ -8,6 +8,8 @@ import com.oopsw.exerciseservice.dto.ExerciseDto;
 
 
 public interface ExerciseService {
-	boolean addExercise(ExerciseDto exerciseDto);
+	void addExercise(ExerciseDto exerciseDto);
 	List<ExerciseDto> getExercises(ExerciseDto exerciseDto);
+	void removeExercise(ExerciseDto exerciseDto);
+	void setExerciseMin(ExerciseDto exerciseDto);
 }
