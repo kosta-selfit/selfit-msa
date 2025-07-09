@@ -2,8 +2,6 @@ package com.oopsw.checklistservice.jpa;
 
 import java.util.Date;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,14 +12,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="checklist")
+@Table(name = "checklist")
 public class ChecklistEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(updatable = false, insertable = false)
-	@ColumnDefault(value = "CURRENT_TIMESTAMP")
+	@Column(nullable = false)
 	private Date checklistDate;
 	@Column(nullable = false)
 	private Integer isChecked;
