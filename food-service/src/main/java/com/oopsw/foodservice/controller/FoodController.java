@@ -1,5 +1,6 @@
 package com.oopsw.foodservice.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -30,15 +31,31 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/food-service")
 public class FoodController {
 	private final FoodService foodService;
+	private final ModelMapper modelMapper;
 
 	@GetMapping("/api-test")
 	public String test() {
 		return "test";
 	}
 
+	@PostMapping("/foods/member/{memberId}")
+	public ResponseEntity<List<ResGetFood>> getFood(@PathVariable("memberId") String memberId, @RequestBody ReqGetFood reqGetFood) {
+		FoodDto foodDto = modelMapper.map(reqGetFood, FoodDto.class);
+		foodDto.setMemberId(memberId);
+
+		List<FoodDto> dtoList = foodService.getFood(foodDto);
+
+		List<ResGetFood> result = new ArrayList<>();
+		for (FoodDto dto : dtoList) {
+			result.add(modelMapper.map(dto, ResGetFood.class));
+		}
+		return ResponseEntity.ok(result);
+
+	}
+
 	@PostMapping("/member/{memberId}")
 	public ResponseEntity<ResMessage> addFood(@PathVariable("memberId") String memberId, @RequestBody ReqAddFood reqAddFood) {
-		FoodDto foodDto = new ModelMapper().map(reqAddFood, FoodDto.class);
+		FoodDto foodDto = modelMapper.map(reqAddFood, FoodDto.class);
 		foodDto.setMemberId(memberId);
 		foodService.addFood(foodDto);
 		return ResponseEntity.ok(new ResMessage("success"));
@@ -46,7 +63,7 @@ public class FoodController {
 
 	@PutMapping("/member/{memberId}")
 	public ResponseEntity<ResMessage> setFood(@PathVariable("memberId") String memberId,@RequestBody ReqSetFood reqSetFood) {
-		FoodDto foodDto = new ModelMapper().map(reqSetFood, FoodDto.class);
+		FoodDto foodDto = modelMapper.map(reqSetFood, FoodDto.class);
 		foodDto.setMemberId(memberId);
 		foodService.setFood(foodDto);
 		return ResponseEntity.ok(new ResMessage("success"));
@@ -54,7 +71,9 @@ public class FoodController {
 
 	@DeleteMapping("/member/{memberId}")
 	public ResponseEntity<ResMessage> removeFood(@PathVariable("memberId") String memberId, @RequestBody ReqRemoveFood reqRemoveFood) {
-		foodService.removeFood(FoodDto.builder().foodId(reqRemoveFood.getFoodId()).memberId(memberId).build());
+		FoodDto foodDto = modelMapper.map(reqRemoveFood, FoodDto.class);
+		foodDto.setMemberId(memberId);
+		foodService.removeFood(foodDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 

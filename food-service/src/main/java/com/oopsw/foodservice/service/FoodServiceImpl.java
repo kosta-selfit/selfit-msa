@@ -1,5 +1,8 @@
 package com.oopsw.foodservice.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,10 +17,21 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FoodServiceImpl implements FoodService {
 	private final FoodRepository foodRepository;
+	private final ModelMapper modelMapper;
+
+	@Override
+	public List<FoodDto> getFood(FoodDto foodDto) {
+		List<FoodEntity> foodEntityList = foodRepository.findByMemberIdAndIntakeDate(foodDto.getMemberId(), foodDto.getIntakeDate());
+		List<FoodDto> foodDtoList = new ArrayList<>();
+		for (FoodEntity foodEntity : foodEntityList) {
+			foodDtoList.add(modelMapper.map(foodEntity, FoodDto.class));
+		}
+		return foodDtoList;
+	}
 
 	@Override
 	public FoodDto addFood(FoodDto foodDto) {
-		FoodEntity foodEntity = new ModelMapper().map(foodDto, FoodEntity.class);
+		FoodEntity foodEntity = modelMapper.map(foodDto, FoodEntity.class);
 		// 1. foodId 자동 증가
 		foodEntity.setFoodId(String.format("f%04d", (foodRepository.findAll().size())+1));
 		// 2. 섭취량과 단위 계산해서 섭취 칼로리 계산
