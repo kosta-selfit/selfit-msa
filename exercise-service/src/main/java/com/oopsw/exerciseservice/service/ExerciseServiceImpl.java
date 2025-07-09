@@ -1,9 +1,12 @@
 package com.oopsw.exerciseservice.service;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -70,14 +73,19 @@ public class ExerciseServiceImpl implements ExerciseService {
 		return exerciseDtos;
 	}
 
+	@Override
 	@Transactional
 	public void removeExercise(ExerciseDto exerciseDto) {
-		if (exerciseRepository.existsByMemberIdAndExerciseId(exerciseDto.getMemberId(), exerciseDto.getExerciseId())) {
-			exerciseRepository.deleteByMemberIdAndExerciseId(exerciseDto.getMemberId(), exerciseDto.getExerciseId());
+		ExerciseEntity exerciseEntity = ExerciseEntity.builder()
+			.memberId(exerciseDto.getMemberId())
+			.exerciseId(exerciseDto.getExerciseId())
+			.build();
+		if (exerciseRepository.existsByMemberIdAndExerciseId(exerciseEntity.getMemberId(), exerciseEntity.getExerciseId())) {
+			exerciseRepository.deleteByMemberIdAndExerciseId(exerciseDto.getMemberId(), exerciseEntity.getExerciseId());
 		}
 	}
 
-
+	@Override
 	public void setExerciseMin(ExerciseDto exerciseDto) {
 		ExerciseEntity exerciseEntity = ExerciseEntity.builder()
 			.memberId(exerciseDto.getMemberId())
@@ -94,4 +102,57 @@ public class ExerciseServiceImpl implements ExerciseService {
 		exercise.setExerciseKcal(kcal);
 		exerciseRepository.save(exercise);
 	}
+
+	@Override
+	public ExerciseDto getExerciseKcal(ExerciseDto exerciseDto) {
+		ExerciseEntity exerciseEntity = ExerciseEntity.builder()
+			.exerciseDate(exerciseDto.getExerciseDate())
+			.memberId(exerciseDto.getMemberId())
+			.build();
+		List<ExerciseEntity> exerciseEntities = exerciseRepository.findByExerciseDateAndMemberId(exerciseEntity.getExerciseDate(), exerciseEntity.getMemberId());
+		float exerciseSum=0;
+		for(ExerciseEntity exerciseEntity1 : exerciseEntities) {
+			exerciseSum += exerciseEntity1.getExerciseKcal();
+		}
+		ExerciseDto resultDto = ExerciseDto.builder()
+			.exerciseSum(exerciseSum)
+			.build();
+		return resultDto;
+	}
+
+	public List<ExerciseDto> getYearExerciseKcal(ExerciseDto exerciseDto) {
+		ExerciseEntity exerciseEntity = ExerciseEntity.builder()
+			.memberId(exerciseDto.getMemberId())
+			.build();
+
+		String start = exerciseDto.getYear() + "-01-01";
+		String end = exerciseDto.getYear() + "-12-31";
+
+		List<ExerciseEntity> exerciseEntities = exerciseRepository.findByMemberIdAndExerciseDateBetween(exerciseEntity.getMemberId(), start, end);
+
+		// 날짜별 그룹핑 + kcal 합산
+		Map<String, Float> kcalPerDate = exerciseEntities.stream()
+			.collect(Collectors.groupingBy(
+				ExerciseEntity::getExerciseDate,
+				Collectors.summingDouble(ExerciseEntity::getExerciseKcal)
+			)).entrySet().stream()
+			.collect(Collectors.toMap(
+				Map.Entry::getKey,
+				e -> e.getValue().floatValue()
+			));
+
+		//날짜별 sorting
+		Map<String, Float> sortedKcalPerDate = new TreeMap<>(kcalPerDate);
+
+		// Map -> ExerciseDto
+		List<ExerciseDto> exerciseDtos = sortedKcalPerDate.entrySet().stream()
+			.map(entry -> ExerciseDto.builder()
+				.exerciseDate (entry.getKey())
+				.exerciseSum(entry.getValue())
+				.build())
+			.collect(Collectors.toList());
+
+		return exerciseDtos;
+	}
+
 }
