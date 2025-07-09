@@ -22,4 +22,5 @@ public class FoodDto {
 	private String memberId;
 
 	private Float intakeKcalSum;
+	private int year;
 }

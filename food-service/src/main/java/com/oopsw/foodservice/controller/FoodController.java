@@ -20,10 +20,12 @@ import com.oopsw.foodservice.service.FoodService;
 import com.oopsw.foodservice.vo.request.ReqAddFood;
 import com.oopsw.foodservice.vo.request.ReqGetFood;
 import com.oopsw.foodservice.vo.request.ReqGetIntakeKcal;
+import com.oopsw.foodservice.vo.request.ReqGetYearIntakeKcal;
 import com.oopsw.foodservice.vo.request.ReqRemoveFood;
 import com.oopsw.foodservice.vo.request.ReqSetFood;
 import com.oopsw.foodservice.vo.response.ResGetFood;
 import com.oopsw.foodservice.vo.response.ResGetIntakeKcal;
+import com.oopsw.foodservice.vo.response.ResGetYearIntakeKcal;
 import com.oopsw.foodservice.vo.response.ResMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -48,6 +50,19 @@ public class FoodController {
 		return ResponseEntity.ok(result);
 	}
 
+	@PostMapping("/kcal/year/member/{memberId}")
+	public ResponseEntity<List<ResGetYearIntakeKcal>> getYearIntakeKcal(@PathVariable String memberId, @RequestBody ReqGetYearIntakeKcal reqGetYearIntakeKcal) {
+		FoodDto foodDto = modelMapper.map(reqGetYearIntakeKcal, FoodDto.class);
+		foodDto.setMemberId(memberId);
+
+		List<FoodDto> dtoList = foodService.getYearIntakeKcal(foodDto);
+
+		List<ResGetYearIntakeKcal> result = new ArrayList<>();
+		for (FoodDto dto : dtoList) {
+			result.add(modelMapper.map(dto, ResGetYearIntakeKcal.class));
+		}
+		return ResponseEntity.ok(result);
+	}
 
 	@PostMapping("/foods/member/{memberId}")
 	public ResponseEntity<List<ResGetFood>> getFood(@PathVariable("memberId") String memberId, @RequestBody ReqGetFood reqGetFood) {

@@ -1,7 +1,12 @@
 package com.oopsw.foodservice.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -29,6 +34,39 @@ public class FoodServiceImpl implements FoodService {
 			}
 		}
 		return FoodDto.builder().intakeKcalSum(intakeKcalSum).build();
+	}
+
+	@Override
+	public List<FoodDto> getYearIntakeKcal(FoodDto foodDto) {
+		int year = foodDto.getYear();
+		String memberId = foodDto.getMemberId();
+
+		// 가져온 년도로 범위 설정
+		LocalDate start = LocalDate.of(year, 1, 1);
+		LocalDate end = LocalDate.of(year, 12, 31);
+
+		List<FoodEntity> foodEntities = foodRepository.findByMemberIdAndIntakeDateBetween(memberId, java.sql.Date.valueOf(start),java.sql.Date.valueOf(end));
+
+		// 날짜별 IntakeKcal 합계
+		Map<Date, Float> IntakeKcalSumMap = new HashMap<>();
+		for (FoodEntity foodEntity : foodEntities) {
+			Date intakeDate = foodEntity.getIntakeDate();
+			float kcal = foodEntity.getIntakeKcal() != null ? foodEntity.getIntakeKcal() : 0f;
+			IntakeKcalSumMap.put(intakeDate, IntakeKcalSumMap.getOrDefault(intakeDate, 0f) + kcal);
+		}
+
+		List<FoodDto> foodDtoList = new ArrayList<>();
+		for (Map.Entry<Date, Float> entry : IntakeKcalSumMap.entrySet()) {
+			foodDtoList.add(FoodDto.builder()
+				.intakeDate(entry.getKey())
+				.intakeKcalSum(entry.getValue())
+				.build());
+		}
+
+		// 날짜순 정렬
+		foodDtoList.sort(Comparator.comparing(FoodDto::getIntakeDate));
+
+		return foodDtoList;
 	}
 
 	@Override
