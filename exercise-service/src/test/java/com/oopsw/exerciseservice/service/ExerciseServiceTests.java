@@ -32,7 +32,7 @@ public class ExerciseServiceTests {
 			.memberId("m001")
 			.met(5.3f)
 			.build();
-		boolean exerciseEntity = exerciseService.addExercise(exerciseDto);
+		exerciseService.addExercise(exerciseDto);
 		log.info(exerciseDto);
 	}
 
