@@ -5,5 +5,6 @@ import com.oopsw.foodservice.dto.FoodDto;
 public interface FoodService {
 	FoodDto addFood(FoodDto foodDto);
 	void removeFood(FoodDto foodDto);
+	FoodDto setFood(FoodDto foodDto);
 
 }

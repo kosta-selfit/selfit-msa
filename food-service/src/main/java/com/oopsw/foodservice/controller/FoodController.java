@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,7 @@ import com.oopsw.foodservice.service.FoodService;
 import com.oopsw.foodservice.vo.request.ReqAddFood;
 import com.oopsw.foodservice.vo.request.ReqGetFood;
 import com.oopsw.foodservice.vo.request.ReqRemoveFood;
+import com.oopsw.foodservice.vo.request.ReqSetFood;
 import com.oopsw.foodservice.vo.response.ResGetFood;
 import com.oopsw.foodservice.vo.response.ResMessage;
 
@@ -39,6 +41,14 @@ public class FoodController {
 		FoodDto foodDto = new ModelMapper().map(reqAddFood, FoodDto.class);
 		foodDto.setMemberId(memberId);
 		foodService.addFood(foodDto);
+		return ResponseEntity.ok(new ResMessage("success"));
+	}
+
+	@PutMapping("/member/{memberId}")
+	public ResponseEntity<ResMessage> setFood(@PathVariable("memberId") String memberId,@RequestBody ReqSetFood reqSetFood) {
+		FoodDto foodDto = new ModelMapper().map(reqSetFood, FoodDto.class);
+		foodDto.setMemberId(memberId);
+		foodService.setFood(foodDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 

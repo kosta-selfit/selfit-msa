@@ -29,6 +29,21 @@ public class FoodServiceImpl implements FoodService {
 
 	@Override
 	@Transactional
+	public FoodDto setFood(FoodDto foodDto) {
+		FoodEntity foodEntity = foodRepository.findByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
+
+		if(foodEntity == null) {
+			throw new IllegalArgumentException("Invalid foodId");
+		}
+
+		foodEntity.setIntake(foodDto.getIntake());
+		foodEntity.setIntakeKcal(foodDto.getIntake()/100f*foodEntity.getUnitKcal());
+		foodRepository.save(foodEntity);
+		return foodDto;
+	}
+
+	@Override
+	@Transactional
 	public void removeFood(FoodDto foodDto) {
 		int foodEntity = foodRepository.deleteByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
 
