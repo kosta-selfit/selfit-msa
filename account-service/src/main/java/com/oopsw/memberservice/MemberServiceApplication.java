@@ -14,8 +14,7 @@ public class MemberServiceApplication {
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
-	//test용 커밋
+
 	public static void main(String[] args) {
 		SpringApplication.run(MemberServiceApplication.class, args);
 	}
