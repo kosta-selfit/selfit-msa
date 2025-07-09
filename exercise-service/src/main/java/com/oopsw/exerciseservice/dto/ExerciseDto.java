@@ -21,9 +21,11 @@ public class ExerciseDto {
 	private float exerciseKcal;
 	private float met;
 	private String keyword;
+	private float exerciseSum;
+	private String year;
+
+
 	private int pageNo;
 	private int numOfRows;
 	private int newMin;
-	private float exerciseSum;
-	private String year;
 }

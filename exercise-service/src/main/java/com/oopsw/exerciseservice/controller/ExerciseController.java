@@ -1,11 +1,10 @@
 package com.oopsw.exerciseservice.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,14 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.oopsw.exerciseservice.dto.ExerciseDto;
 import com.oopsw.exerciseservice.service.ExerciseService;
 import com.oopsw.exerciseservice.vo.request.ReqAddExercise;
-import com.oopsw.exerciseservice.vo.request.ReqGetExerciseApi;
 import com.oopsw.exerciseservice.vo.request.ReqGetExerciseKcal;
+import com.oopsw.exerciseservice.vo.request.ReqGetExerciseOpenSearch;
 import com.oopsw.exerciseservice.vo.request.ReqGetExercises;
 import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqRemoveExercise;
 import com.oopsw.exerciseservice.vo.request.ReqSetExerciseMin;
-import com.oopsw.exerciseservice.vo.response.ResGetExerciseApi;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseKcal;
+import com.oopsw.exerciseservice.vo.response.ResGetExerciseOpenSearch;
 import com.oopsw.exerciseservice.vo.response.ResGetExercises;
 import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResMessage;
@@ -130,5 +129,28 @@ public class ExerciseController {
 			resGetYearExerciseKcals.add(resGetYearExerciseKcal);
 		}
 		return ResponseEntity.ok(resGetYearExerciseKcals);
+	}
+
+	@PostMapping("/openSearch")
+	public ResponseEntity<Mono<List<ResGetExerciseOpenSearch>>> getExerciseOpenSearch(@RequestBody ReqGetExerciseOpenSearch reqGetExerciseOpenSearch) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.keyword(reqGetExerciseOpenSearch.getKeyword())
+			.numOfRows(reqGetExerciseOpenSearch.getNumOfRows())
+			.pageNo(reqGetExerciseOpenSearch.getPageNo())
+			.build();
+
+		Mono<List<ExerciseDto>> exerciseDtos = exerciseService.getExerciseOpenSearch(exerciseDto);
+
+		log.info("Dto" + exerciseDtos.toString());
+		Mono<List<ResGetExerciseOpenSearch>> resGetExerciseOpenSearch = exerciseDtos.map(dtoList ->
+			dtoList.stream()
+				.map(dto -> new ResGetExerciseOpenSearch(
+					dto.getMet(), dto.getExerciseName()
+					// 필요 시 다른 필드도 매핑
+				))
+				.collect(Collectors.toList())
+		);
+		log.info("res" + resGetExerciseOpenSearch.toString());
+		return ResponseEntity.ok(resGetExerciseOpenSearch);
 	}
 }

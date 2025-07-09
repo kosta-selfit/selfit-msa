@@ -5,8 +5,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ReqGetExerciseApi {
+public class ReqGetExerciseOpenSearch {
 	private String keyword;
 	private int pageNo;
 	private int numOfRows;
+
+
 }
