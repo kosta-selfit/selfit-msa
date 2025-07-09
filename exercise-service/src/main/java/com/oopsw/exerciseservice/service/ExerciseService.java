@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.oopsw.exerciseservice.dto.ExerciseDto;
 
+import reactor.core.publisher.Mono;
 
 public interface ExerciseService {
 	void addExercise(ExerciseDto exerciseDto);
@@ -14,4 +15,5 @@ public interface ExerciseService {
 	void setExerciseMin(ExerciseDto exerciseDto);
 	ExerciseDto getExerciseKcal(ExerciseDto exerciseDto);
 	List<ExerciseDto> getYearExerciseKcal(ExerciseDto exerciseDto);
+	Mono<List<ExerciseDto>> getExerciseOpenSearch(ExerciseDto exerciseDto);
 }

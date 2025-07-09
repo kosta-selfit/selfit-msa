@@ -16,10 +16,12 @@ import org.springframework.ui.Model;
 import com.oopsw.exerciseservice.dto.ExerciseDto;
 import com.oopsw.exerciseservice.jpa.ExerciseEntity;
 import com.oopsw.exerciseservice.jpa.ExerciseRepository;
+import com.oopsw.exerciseservice.repository.ExerciseApiRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Mono;
 
 @Log4j2
 @Service
@@ -27,6 +29,7 @@ import lombok.extern.log4j.Log4j2;
 public class ExerciseServiceImpl implements ExerciseService {
 
 	private final ExerciseRepository exerciseRepository;
+	private final ExerciseApiRepository exerciseApiRepository;
 
 	@Override
 	public void addExercise(ExerciseDto exerciseDto) {
@@ -153,6 +156,27 @@ public class ExerciseServiceImpl implements ExerciseService {
 			.collect(Collectors.toList());
 
 		return exerciseDtos;
+	}
+
+	public Mono<List<ExerciseDto>> getExerciseOpenSearch(ExerciseDto exerciseDto) {
+		if (exerciseDto.getKeyword() == null || exerciseDto.getKeyword().isBlank()) {
+			return Mono.error(new IllegalArgumentException("검색 키워드를 입력해야 합니다."));
+		}
+		if (exerciseDto.getPageNo() < 1 || exerciseDto.getNumOfRows() < 1) {
+			return Mono.error(new IllegalArgumentException("pageNo와 numOfRows는 1 이상이어야 합니다."));
+		}
+
+		return exerciseApiRepository.fetchExerciseData(exerciseDto.getPageNo(), exerciseDto.getNumOfRows())
+			.map(list ->
+				// null-safe 필터링
+				(list != null ? list.stream()
+					.filter(item -> {
+						String name = item.getExerciseName();
+						return name != null && name.contains(exerciseDto.getKeyword());
+					})
+					.collect(Collectors.toList())
+					: Collections.emptyList())
+			);
 	}
 
 }
