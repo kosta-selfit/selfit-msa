@@ -12,4 +12,6 @@ public interface ExerciseService {
 	List<ExerciseDto> getExercises(ExerciseDto exerciseDto);
 	void removeExercise(ExerciseDto exerciseDto);
 	void setExerciseMin(ExerciseDto exerciseDto);
+	ExerciseDto getExerciseKcal(ExerciseDto exerciseDto);
+	List<ExerciseDto> getYearExerciseKcal(ExerciseDto exerciseDto);
 }

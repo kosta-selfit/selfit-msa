@@ -24,5 +24,6 @@ public class ExerciseDto {
 	private int pageNo;
 	private int numOfRows;
 	private int newMin;
-
+	private float exerciseSum;
+	private String year;
 }

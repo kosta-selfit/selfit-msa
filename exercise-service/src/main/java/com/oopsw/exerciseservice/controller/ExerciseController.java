@@ -1,6 +1,7 @@
 package com.oopsw.exerciseservice.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,11 +20,15 @@ import com.oopsw.exerciseservice.dto.ExerciseDto;
 import com.oopsw.exerciseservice.service.ExerciseService;
 import com.oopsw.exerciseservice.vo.request.ReqAddExercise;
 import com.oopsw.exerciseservice.vo.request.ReqGetExerciseApi;
+import com.oopsw.exerciseservice.vo.request.ReqGetExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqGetExercises;
+import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqRemoveExercise;
 import com.oopsw.exerciseservice.vo.request.ReqSetExerciseMin;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseApi;
+import com.oopsw.exerciseservice.vo.response.ResGetExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResGetExercises;
+import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResMessage;
 
 import lombok.RequiredArgsConstructor;
@@ -54,7 +59,7 @@ public class ExerciseController {
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
-	@PostMapping("/member/{memberId}")
+	@PostMapping("/exercises/member/{memberId}")
 	public ResponseEntity<List<ResGetExercises>> getExercises(@RequestBody ReqGetExercises reqGetExercises, @PathVariable String memberId) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
 			.exerciseDate(reqGetExercises.getExerciseDate())
@@ -75,17 +80,17 @@ public class ExerciseController {
 	}
 
 	@DeleteMapping("/member/{memberId}")
-	public ResponseEntity<ResMessage> removeExercise(@PathVariable String exerciseId, @RequestBody ReqRemoveExercise reqRemoveExercise) {
+	public ResponseEntity<ResMessage> removeExercise(@RequestBody ReqRemoveExercise reqRemoveExercise, @PathVariable String memberId) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
-			.memberId(reqRemoveExercise.getExerciseId())
-			.exerciseId(exerciseId)
+			.memberId(memberId)
+			.exerciseId(reqRemoveExercise.getExerciseId())
 			.build();
 		exerciseService.removeExercise(exerciseDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
 	@PutMapping("/member/{memberId}")
-	public ResponseEntity<ResMessage> setExerciseMin(@PathVariable String memberId, @RequestBody ReqSetExerciseMin reqSetExerciseMin) {
+	public ResponseEntity<ResMessage> setExerciseMin(@RequestBody ReqSetExerciseMin reqSetExerciseMin, @PathVariable String memberId) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
 			.exerciseId(reqSetExerciseMin.getExerciseId())
 			.memberId(memberId)
@@ -93,5 +98,37 @@ public class ExerciseController {
 			.build();
 		exerciseService.setExerciseMin(exerciseDto);
 		return ResponseEntity.ok(new ResMessage("success"));
+	}
+
+	@PostMapping("/kcal/member/{memberId}")
+	public ResponseEntity<ResGetExerciseKcal> getExerciseKcal(@RequestBody ReqGetExerciseKcal reqGetExerciseKcal, @PathVariable String memberId) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.exerciseDate(reqGetExerciseKcal.getExerciseDate())
+			.memberId(memberId)
+			.build();
+		ExerciseDto resultDto = exerciseService.getExerciseKcal(exerciseDto);
+		ResGetExerciseKcal resGetExerciseKcal = ResGetExerciseKcal.builder()
+			.exerciseSum(resultDto.getExerciseSum())
+			.build();
+		return ResponseEntity.ok(resGetExerciseKcal);
+	}
+
+	@PostMapping("/year/member/{memberId}")
+	public ResponseEntity<List<ResGetYearExerciseKcal>> getYearExerciseKcal(@RequestBody ReqGetYearExerciseKcal reqGetYearExerciseKcal, @PathVariable String memberId) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.memberId(memberId)
+			.year(reqGetYearExerciseKcal.getYear())
+			.build();
+
+		List<ResGetYearExerciseKcal> resGetYearExerciseKcals = new ArrayList<>();
+		List<ExerciseDto> exerciseDtos = exerciseService.getYearExerciseKcal(exerciseDto);
+		for (ExerciseDto exerciseDto1 : exerciseDtos) {
+			ResGetYearExerciseKcal resGetYearExerciseKcal = ResGetYearExerciseKcal.builder()
+				.exerciseDate(exerciseDto1.getExerciseDate())
+				.exerciseSum(exerciseDto1.getExerciseSum())
+				.build();
+			resGetYearExerciseKcals.add(resGetYearExerciseKcal);
+		}
+		return ResponseEntity.ok(resGetYearExerciseKcals);
 	}
 }
