@@ -6,9 +6,11 @@ import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +20,8 @@ import com.oopsw.exerciseservice.service.ExerciseService;
 import com.oopsw.exerciseservice.vo.request.ReqAddExercise;
 import com.oopsw.exerciseservice.vo.request.ReqGetExerciseApi;
 import com.oopsw.exerciseservice.vo.request.ReqGetExercises;
+import com.oopsw.exerciseservice.vo.request.ReqRemoveExercise;
+import com.oopsw.exerciseservice.vo.request.ReqSetExerciseMin;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseApi;
 import com.oopsw.exerciseservice.vo.response.ResGetExercises;
 import com.oopsw.exerciseservice.vo.response.ResMessage;
@@ -50,7 +54,7 @@ public class ExerciseController {
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
-	@PostMapping("/exercises/member/{memberId}")
+	@PostMapping("/member/{memberId}")
 	public ResponseEntity<List<ResGetExercises>> getExercises(@RequestBody ReqGetExercises reqGetExercises, @PathVariable String memberId) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
 			.exerciseDate(reqGetExercises.getExerciseDate())
@@ -68,5 +72,26 @@ public class ExerciseController {
 			resGetExercises.add(resGetExercise);
 		}
 		return ResponseEntity.ok(resGetExercises);
+	}
+
+	@DeleteMapping("/member/{memberId}")
+	public ResponseEntity<ResMessage> removeExercise(@PathVariable String exerciseId, @RequestBody ReqRemoveExercise reqRemoveExercise) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.memberId(reqRemoveExercise.getExerciseId())
+			.exerciseId(exerciseId)
+			.build();
+		exerciseService.removeExercise(exerciseDto);
+		return ResponseEntity.ok(new ResMessage("success"));
+	}
+
+	@PutMapping("/member/{memberId}")
+	public ResponseEntity<ResMessage> setExerciseMin(@PathVariable String memberId, @RequestBody ReqSetExerciseMin reqSetExerciseMin) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.exerciseId(reqSetExerciseMin.getExerciseId())
+			.memberId(memberId)
+			.newMin(reqSetExerciseMin.getNewMin())
+			.build();
+		exerciseService.setExerciseMin(exerciseDto);
+		return ResponseEntity.ok(new ResMessage("success"));
 	}
 }
