@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -88,7 +89,6 @@ public class FoodServiceImpl implements FoodService {
 				.intakeKcalSum(entry.getValue())
 				.build());
 		}
-
 		// 날짜순 정렬
 		foodDtoList.sort(Comparator.comparing(FoodDto::getIntakeDate));
 
@@ -108,11 +108,9 @@ public class FoodServiceImpl implements FoodService {
 	@Override
 	public FoodDto addFood(FoodDto foodDto) {
 		FoodEntity foodEntity = modelMapper.map(foodDto, FoodEntity.class);
-		// 1. foodId 자동 증가
-		foodEntity.setFoodId(String.format("f%04d", (foodRepository.findAll().size())+1));
-		// 2. 섭취량과 단위 계산해서 섭취 칼로리 계산
+		// foodEntity.setFoodId(String.format("f%04d", (foodRepository.findAll().size())+1));
+		foodEntity.setFoodId(UUID.randomUUID().toString());
 		foodEntity.setIntakeKcal(foodDto.getIntake()/100f*foodDto.getUnitKcal());
-		// 3. 저장
 		foodRepository.save(foodEntity);
 		return foodDto;
 	}
