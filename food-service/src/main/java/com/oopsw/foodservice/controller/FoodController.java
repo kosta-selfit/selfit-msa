@@ -1,6 +1,7 @@
 package com.oopsw.foodservice.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -15,20 +16,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.oopsw.foodservice.dto.FoodApiDto;
 import com.oopsw.foodservice.dto.FoodDto;
 import com.oopsw.foodservice.service.FoodService;
 import com.oopsw.foodservice.vo.request.ReqAddFood;
 import com.oopsw.foodservice.vo.request.ReqGetFood;
 import com.oopsw.foodservice.vo.request.ReqGetIntakeKcal;
 import com.oopsw.foodservice.vo.request.ReqGetYearIntakeKcal;
+import com.oopsw.foodservice.vo.request.ReqOpenFoodSearch;
 import com.oopsw.foodservice.vo.request.ReqRemoveFood;
 import com.oopsw.foodservice.vo.request.ReqSetFood;
 import com.oopsw.foodservice.vo.response.ResGetFood;
 import com.oopsw.foodservice.vo.response.ResGetIntakeKcal;
 import com.oopsw.foodservice.vo.response.ResGetYearIntakeKcal;
 import com.oopsw.foodservice.vo.response.ResMessage;
+import com.oopsw.foodservice.vo.response.ResOpenFoodSearch;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
@@ -103,4 +108,18 @@ public class FoodController {
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
+	@PostMapping("open-search")
+	public ResponseEntity<Mono<List<ResOpenFoodSearch>>> openFoodSearch(@RequestBody ReqOpenFoodSearch reqOpenFoodSearch) {
+		FoodApiDto foodApiDto = modelMapper.map(reqOpenFoodSearch, FoodApiDto.class);
+
+		Mono<List<ResOpenFoodSearch>> body = foodService.getFoodByNameLike(foodApiDto)
+			.map(dtoList -> {
+				List<ResOpenFoodSearch> result = new ArrayList<>();
+				for (FoodApiDto dto : dtoList) {
+					result.add(modelMapper.map(dto, ResOpenFoodSearch.class));
+				}
+				return result;
+			});
+		return ResponseEntity.ok(body);
+	}
 }

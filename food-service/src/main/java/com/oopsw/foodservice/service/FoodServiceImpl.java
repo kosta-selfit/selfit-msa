@@ -7,22 +7,48 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.oopsw.foodservice.dto.FoodApiDto;
 import com.oopsw.foodservice.dto.FoodDto;
 import com.oopsw.foodservice.jpa.FoodEntity;
-import com.oopsw.foodservice.jpa.FoodRepository;
+import com.oopsw.foodservice.repository.FoodApiRepository;
+import com.oopsw.foodservice.repository.FoodRepository;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
 public class FoodServiceImpl implements FoodService {
 	private final FoodRepository foodRepository;
+	private final FoodApiRepository foodApiRepository;
 	private final ModelMapper modelMapper;
+
+	@Override
+	public Mono<List<FoodApiDto>> getFoodByNameLike(FoodApiDto foodApiDto) {
+		if(foodApiDto.getKeyword() == null || foodApiDto.getKeyword().isBlank()) {
+			return Mono.error(new IllegalArgumentException("검색 키워드를 입력해야 합니다."));
+		}
+		if(foodApiDto.getPageNo() < 1 || foodApiDto.getNumOfRows() < 1) {
+			return Mono.error(new IllegalArgumentException("Invalid pageNo or numOfRows"));
+		}
+		return foodApiRepository.fetchFoodData(foodApiDto.getPageNo(), foodApiDto.getNumOfRows())
+			.map(list ->
+				// Java 스트림을 이용해 'foodNm'에 keyword 포함된 항목만 필터
+				list.stream()
+					.filter(item -> {
+						// null 검사 추가
+						String name = item.getFoodNm();
+						return name != null && name.contains(foodApiDto.getKeyword());
+					})
+					.collect(Collectors.toList())
+			);
+	}
 
 	@Override
 	public FoodDto getIntakeKcal(FoodDto foodDto) {
