@@ -1,5 +1,9 @@
 package com.oopsw.memberservice.service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
@@ -24,6 +28,7 @@ public class MemberServiceImpl implements MemberService {
 	public void addMember(MemberDto memberDto) {
 		memberDto.setMemberId(UUID.randomUUID().toString());
 		memberDto.setPw(passwordEncoder.encode(memberDto.getPw()));
+		memberDto.setBmr(calculateBmr(memberDto));
 
 		memberRepository.save(new ModelMapper().map(memberDto, MemberEntity.class));
 	}
@@ -49,6 +54,7 @@ public class MemberServiceImpl implements MemberService {
 		if (memberDto.getPw() != null) {
 			memberDto.setPw(passwordEncoder.encode(memberDto.getPw()));
 		}
+		memberDto.setBmr(calculateBmr(memberDto));
 
 		new ModelMapper().map(memberDto, memberEntity);
 		memberEntity.setId(id);
@@ -74,6 +80,39 @@ public class MemberServiceImpl implements MemberService {
 	public Boolean checkPw(MemberDto memberDto) {
 		MemberEntity memberEntity = memberRepository.findByMemberId(memberDto.getMemberId());
 		return passwordEncoder.matches(memberDto.getPw(), memberEntity.getPw());
+	}
+
+	private Float calculateBmr(MemberDto memberDto) {
+		Float height = memberDto.getHeight();
+		Float weight = memberDto.getWeight();
+		Integer age = getAge(memberDto);
+		String gender = memberDto.getGender();
+
+		if (height == null || weight == null || age == null || gender == null) {
+			return null;
+		}
+
+		Double bmr;
+		if (gender.equals("남자")) {
+			bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+		} else {
+			bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+		}
+
+		return bmr.floatValue();
+	}
+
+	private Integer getAge(MemberDto memberDto) {
+		LocalDate today = LocalDate.now();
+		Date birthday = memberDto.getBirthday();
+
+		if (birthday == null) {
+			return null;
+		}
+
+		LocalDate birthdateLocal = birthday.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+
+		return Period.between(birthdateLocal, today).getYears();
 	}
 
 }

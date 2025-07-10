@@ -30,32 +30,35 @@ public class MemberEntity {
 	@Column(name = "member_id", unique = true, nullable = false)
 	private String memberId;
 
-	@Column(name = "email", unique = true, nullable = false, length = 50)
+	@Column(name = "email", unique = true, nullable = false)
 	private String email;
 
 	@Column(name = "pw", nullable = false)
 	private String pw;
 
-	@Column(name = "name", length = 20)
+	@Column(name = "name")
 	private String name;
 
-	@Column(name = "nickname", unique = true, length = 20)
+	@Column(name = "nickname", unique = true)
 	private String nickname;
 
-	@Column(name = "gender", length = 2)
+	@Column(name = "gender")
 	private String gender;
 
-	@Column(name = "birthday", length = 30)
+	@Column(name = "birthday")
 	private Date birthday;
 
-	@Column(name = "height", length = 5)
+	@Column(name = "height")
 	private Float height;
 
-	@Column(name = "weight", length = 5)
+	@Column(name = "weight")
 	private Float weight;
 
-	@Column(name = "goal", length = 5)
+	@Column(name = "goal")
 	private String goal;
+
+	@Column(name = "bmr")
+	private Float bmr;
 
 	@Column(name = "join_date", nullable = false, updatable = false, insertable = false)
 	@ColumnDefault(value = "CURRENT_TIMESTAMP")
