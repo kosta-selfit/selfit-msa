@@ -6,16 +6,16 @@ spring:
     name: member-service
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://127.0.0.1:3306/mydb?characterEncoding=UTF-8
-    username: mydbid
-    password: mydbpw
+    url: jdbc:mariadb://34.47.102.46:3306/selfit?characterEncoding=UTF-8
+    username: kosta
+    password: hr7292
 
   #  h2:
-#    console:
-#      enabled: true
-#      path: /h2-console
-#      settings:
-#        web-allow-others: true
+  #    console:
+  #      enabled: true
+  #      path: /h2-console
+  #      settings:
+  #        web-allow-others: true
   jpa:
     hibernate:
       ddl-auto: update
