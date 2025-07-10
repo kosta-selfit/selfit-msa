@@ -1,5 +1,6 @@
 package com.oopsw.exerciseservice.dto;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,7 +18,7 @@ public class ExerciseDto {
 	private Long id;
 	private String memberId;
 	private String exerciseId;
-	private String exerciseDate;
+	private LocalDate exerciseDate;
 	@JsonProperty("운동명")
 	private String exerciseName;
 	private int exerciseMin;

@@ -131,7 +131,7 @@ public class ExerciseController {
 		return ResponseEntity.ok(resGetYearExerciseKcals);
 	}
 
-	@PostMapping("/openSearch")
+	@PostMapping("/open-search")
 	public ResponseEntity<Mono<List<ResGetExerciseOpenSearch>>> getExerciseOpenSearch(@RequestBody ReqGetExerciseOpenSearch reqGetExerciseOpenSearch) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
 			.keyword(reqGetExerciseOpenSearch.getKeyword())
@@ -141,7 +141,6 @@ public class ExerciseController {
 
 		Mono<List<ExerciseDto>> exerciseDtos = exerciseService.getExerciseOpenSearch(exerciseDto);
 
-		log.info("Dto" + exerciseDtos.toString());
 		Mono<List<ResGetExerciseOpenSearch>> resGetExerciseOpenSearch = exerciseDtos.map(dtoList ->
 			dtoList.stream()
 				.map(dto -> new ResGetExerciseOpenSearch(
@@ -150,7 +149,6 @@ public class ExerciseController {
 				))
 				.collect(Collectors.toList())
 		);
-		log.info("res" + resGetExerciseOpenSearch.toString());
 		return ResponseEntity.ok(resGetExerciseOpenSearch);
 	}
 }
