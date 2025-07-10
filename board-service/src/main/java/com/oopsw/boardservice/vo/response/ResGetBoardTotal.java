@@ -9,12 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResGetBoard {
-	private String boardTitle;
-	private String categoryName;
-	private String nickName;
-	private String createdDate;
-	private int commentCount;
-	private int viewCount;
-
+public class ResGetBoardTotal {
+	private int totalBoard;
 }

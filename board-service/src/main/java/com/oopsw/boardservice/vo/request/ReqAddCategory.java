@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqAddBoard {
-	private String boardTitle;
-	private String boardContent;
+public class ReqAddCategory {
+	private String categoryId;
 	private String categoryName;
-	private String boardImg;
 }
