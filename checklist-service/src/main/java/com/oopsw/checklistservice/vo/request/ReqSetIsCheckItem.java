@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class ReqSetIsCheckItem {
 	private String checklistId;
- 	private int isChecked;
+	private int isChecked;
 
 }

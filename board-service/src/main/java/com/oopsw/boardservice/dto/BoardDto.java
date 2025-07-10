@@ -14,10 +14,13 @@ public class BoardDto {
 	private Long id;
 	private String boardTitle;
 	private String boardContent;
-	private String categoryId;
 	private String categoryName;
 	private String boardImg;
 	private String createdDate;
+	private String nickName;
+	private int viewCount;
+	private int commentCount;
+	private int totalCount;
 	private String boardId;
 	private String memberId;
 }

@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ResGetExerciseApi {
-	private float met;
-	private String exerciseName;
+public class ResGetExerciseKcal {
+	public float exerciseSum;
 }

@@ -15,7 +15,6 @@ public class MemberServiceApplication {
 		return new BCryptPasswordEncoder();
 	}
 
-
 	public static void main(String[] args) {
 		SpringApplication.run(MemberServiceApplication.class, args);
 	}

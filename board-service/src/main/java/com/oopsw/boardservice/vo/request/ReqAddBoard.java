@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class ReqAddBoard {
 	private String boardTitle;
 	private String boardContent;
-	private String categoryId;
+	private String categoryName;
 	private String boardImg;
 }

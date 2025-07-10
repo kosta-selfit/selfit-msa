@@ -5,8 +5,6 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ReqGetExerciseApi {
-	private String keyword;
-	private int pageNo;
-	private int numOfRows;
+public class ReqGetYearExerciseKcal {
+	private String year;
 }
