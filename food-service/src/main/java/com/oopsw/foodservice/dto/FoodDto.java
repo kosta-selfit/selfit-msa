@@ -20,4 +20,7 @@ public class FoodDto {
 	private Float intakeKcal;
 	private Integer unitKcal;
 	private String memberId;
+
+	private Float intakeKcalSum;
+	private int year;
 }
