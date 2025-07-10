@@ -1,6 +1,7 @@
 package com.oopsw.exerciseservice.jpa;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -32,7 +33,7 @@ public class ExerciseEntity implements Serializable {
 	private String exerciseId;
 
 	@Column(nullable = false)
-	private String exerciseDate;
+	private LocalDate exerciseDate;
 
 	@Column(nullable = false)
 	private String exerciseName;

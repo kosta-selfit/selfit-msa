@@ -1,21 +1,19 @@
 package com.oopsw.exerciseservice.service;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import com.oopsw.exerciseservice.dto.ExerciseDto;
 import com.oopsw.exerciseservice.jpa.ExerciseEntity;
-import com.oopsw.exerciseservice.jpa.ExerciseRepository;
+import com.oopsw.exerciseservice.repository.ExerciseRepository;
 import com.oopsw.exerciseservice.repository.ExerciseApiRepository;
 
 import jakarta.transaction.Transactional;
@@ -128,13 +126,14 @@ public class ExerciseServiceImpl implements ExerciseService {
 			.memberId(exerciseDto.getMemberId())
 			.build();
 
-		String start = exerciseDto.getYear() + "-01-01";
-		String end = exerciseDto.getYear() + "-12-31";
+		LocalDate start = LocalDate.parse(exerciseDto.getYear() + "-01-01");
+		LocalDate end = LocalDate.parse(exerciseDto.getYear() + "-12-31");
+
 
 		List<ExerciseEntity> exerciseEntities = exerciseRepository.findByMemberIdAndExerciseDateBetween(exerciseEntity.getMemberId(), start, end);
 
 		// 날짜별 그룹핑 + kcal 합산
-		Map<String, Float> kcalPerDate = exerciseEntities.stream()
+		Map<LocalDate, Float> kcalPerDate = exerciseEntities.stream()
 			.collect(Collectors.groupingBy(
 				ExerciseEntity::getExerciseDate,
 				Collectors.summingDouble(ExerciseEntity::getExerciseKcal)
@@ -145,7 +144,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 			));
 
 		//날짜별 sorting
-		Map<String, Float> sortedKcalPerDate = new TreeMap<>(kcalPerDate);
+		Map<LocalDate, Float> sortedKcalPerDate = new TreeMap<>(kcalPerDate);
 
 		// Map -> ExerciseDto
 		List<ExerciseDto> exerciseDtos = sortedKcalPerDate.entrySet().stream()
