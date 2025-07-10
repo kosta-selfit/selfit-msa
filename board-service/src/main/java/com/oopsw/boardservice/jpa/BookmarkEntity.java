@@ -20,34 +20,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Entity
-@Table(name="board")
-public class BoardEntity {
+@Table(name="bookmark")
+public class BookmarkEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(nullable = false)
-	private String boardTitle;
+	private String boardId;
 
 	@Column(nullable = false)
-	private String boardContent;
-
-	@Column(nullable = false)
-	private String categoryName;
-
-	@Column()
-	private String boardImg;
+	private String memberId;
 
 	@Column(nullable = false, updatable = false, insertable = false)
 	@ColumnDefault(value = "CURRENT_TIMESTAMP")
-	private Date createdDate;
+	private Date bookmarkAt;
 
-	@Column(nullable = false)
-	private int viewCount;
-
-	@Column(nullable = false, unique = true)
-	private String boardId;
-	@Column(nullable = false)
-	private String memberId;
 
 }

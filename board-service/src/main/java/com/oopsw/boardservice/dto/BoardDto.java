@@ -1,5 +1,7 @@
 package com.oopsw.boardservice.dto;
 
+import java.util.Date;
+
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +18,7 @@ public class BoardDto {
 	private String boardContent;
 	private String categoryName;
 	private String boardImg;
-	private String createdDate;
+	private Date createdDate;
 	private String nickName;
 	private int viewCount;
 	private int commentCount;

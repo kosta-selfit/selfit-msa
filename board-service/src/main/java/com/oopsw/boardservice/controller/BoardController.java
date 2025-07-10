@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -68,19 +69,47 @@ public class BoardController {
 	@GetMapping("/{boardId}/member/{memberId}")
 	public ResponseEntity<ResGetBoard> getBoard(@PathVariable String boardId,
 												@PathVariable String memberId){
+		BoardDto boardDto = BoardDto.builder()
+			.boardId(boardId)
+			.memberId(memberId)
+			.build();
 
-		ResGetBoard resGetBoard =modelMapper.map(boardService.getBoard(boardId), ResGetBoard.class);
+		ResGetBoard resGetBoard =modelMapper.map(boardService.getBoard(boardDto), ResGetBoard.class);
 
 		return ResponseEntity.ok(resGetBoard);
 	}
 
 	@PutMapping("/update/member/{memberId}")
 	public ResponseEntity<ResMessage> setBoard(@PathVariable String memberId, @RequestBody ReqSetBoard reqSetBoard){
-
-		boardService.setBoard(modelMapper.map(reqSetBoard, BoardDto.class));
+		BoardDto boardDto = modelMapper.map(reqSetBoard, BoardDto.class);
+		boardDto.setMemberId(memberId);
+		boardService.setBoard(boardDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
+	@DeleteMapping("/{boardId}/member/{memberId}")
+	public ResponseEntity<ResMessage> removeBoard(@PathVariable String boardId, @PathVariable String memberId){
+		BoardDto boardDto = BoardDto.builder()
+			.boardId(boardId)
+			.memberId(memberId)
+			.build();
+
+		System.out.println(boardDto);
+		boardService.removeBoard(boardDto);
+
+		return ResponseEntity.ok(new ResMessage("success"));
+	}
+
+	@PutMapping("/bookmark/{boardId}/member/{memberId}")
+	public ResponseEntity<ResMessage> toggleBookmark(@PathVariable String boardId, @PathVariable String memberId){
+		BoardDto boardDto = BoardDto.builder()
+			.boardId(boardId)
+			.memberId(memberId)
+			.build();
+		boardService.toggleBookmark(boardDto);
+
+		return ResponseEntity.ok(new ResMessage("success"));
+	}
 
 
 	// @GetMapping("/total")
