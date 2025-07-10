@@ -15,14 +15,19 @@ import org.springframework.stereotype.Service;
 import com.oopsw.boardservice.dto.BoardDto;
 import com.oopsw.boardservice.jpa.BoardEntity;
 import com.oopsw.boardservice.jpa.BoardRepository;
+import com.oopsw.boardservice.jpa.BookmarkEntity;
+import com.oopsw.boardservice.jpa.BookmarkRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RequiredArgsConstructor
 @Service
 public class BoardServiceImpl implements BoardService {
 
 	private final BoardRepository boardRepository;
+	private final BookmarkRepository bookmarkRepository;
 	private final ModelMapper modelMapper;
 
 	private void validateBoardRequiredFields(BoardDto boardDto) {
@@ -38,16 +43,16 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public BoardDto getBoard(String boardId) {
-		BoardEntity boardEntity = boardRepository.findByBoardId(boardId)
+	public BoardDto getBoard(BoardDto boardDto) {
+		BoardEntity boardEntity = boardRepository.findByBoardId(boardDto.getBoardId())
 			.orElseThrow(() ->
-				new IllegalArgumentException("수정하려는 게시글이 존재하지 않습니다.")
+				new IllegalArgumentException("게시글이 존재하지 않습니다.")
 			);
 		boardEntity.setViewCount(boardEntity.getViewCount() + 1);
 		boardRepository.save(boardEntity);
 
-		BoardDto boardDto = modelMapper.map(boardEntity, BoardDto.class);
-		return boardDto;
+		BoardDto resultBoard = modelMapper.map(boardEntity, BoardDto.class);
+		return resultBoard;
 	}
 
 	@Override
@@ -118,11 +123,39 @@ public class BoardServiceImpl implements BoardService {
 
 		BoardEntity boardEntity = boardRepository.findByBoardId(boardDto.getBoardId())
 				.orElseThrow(() ->
-						new IllegalArgumentException("수정하려는 게시글이 존재하지 않습니다.")
-					);
-		modelMapper.map(boardDto, boardEntity);
-
+						new IllegalArgumentException("수정하려는 게시글이 존재하지 않습니다."));
+		boardEntity.setCategoryName(boardDto.getCategoryName());
+		boardEntity.setBoardTitle(boardDto.getBoardTitle());
+		boardEntity.setBoardContent(boardDto.getBoardContent());
+		System.out.println(boardEntity);
 		boardRepository.save(boardEntity);
+	}
 
+	@Override
+	public void removeBoard(BoardDto boardDto) {
+		System.out.println(boardDto);
+		BoardEntity boardEntity = boardRepository.findByBoardId(boardDto.getBoardId())
+			.orElseThrow(()->
+				new IllegalArgumentException("삭제하려는 게시글이 존재하지 않습니다."));
+
+		if (boardEntity.getBoardId().equals(boardDto.getBoardId())) {
+			boardRepository.delete(boardEntity);
+		}
+	}
+
+	@Override
+	public void toggleBookmark(BoardDto boardDto) {
+		if (boardDto.getMemberId() == null) {
+			throw new IllegalArgumentException("로그인을 해주세요.");
+		}
+
+		BookmarkEntity bookmarkEntity = bookmarkRepository
+			.findByBoardIdAndMemberId(boardDto.getBoardId(), boardDto.getMemberId());
+
+		if (bookmarkEntity != null) {
+			bookmarkRepository.delete(bookmarkEntity);
+		} else {
+			bookmarkRepository.save(modelMapper.map(boardDto, BookmarkEntity.class));
+		}
 	}
 }
