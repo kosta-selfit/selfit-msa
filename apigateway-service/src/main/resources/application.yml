@@ -6,38 +6,74 @@ spring:
     name: apigateway-service
 
   cloud:
-    gateway:
-      mvc:
+#    default-filters:
+#      - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+#    globalcors:
+#      cors-configurations:
+#        '[/**]':
+#          allowedOrigins:
+#            - 'http://localhost:5173'  # 프론트엔드 주소 (개발 환경)
+#          allow-credentials: true
+#          allowedHeaders: '*'
+#          allowedMethods:
+#            - GET
+#            - POST
+#            - PUT
+#            - DELETE
+#            - OPTIONS
 
-        routes:
-          - id: account-service
-            uri: lb://account-service
+    gateway.server.webflux:
+      routes:
+          - id: member-service
+            uri: lb://member-service
             predicates:
-              - Path=/api/account-service/**
+              - Path=/api/member-service/login-process
+              - Method=POST
+            filters:
+              - RemoveRequestHeader=Cookie
+          - id: member-service
+            uri: lb://member-service
+            predicates:
+              - Path=/api/member-service/member
+              - Method=POST
+            filters:
+              - RemoveRequestHeader=Cookie
           - id: board-service
             uri: lb://board-service
             predicates:
               - Path=/api/board-service/**
+            filters:
+              - AuthorizationHeaderFilter
           - id: comment-service
             uri: lb://comment-service
             predicates:
               - Path=/api/comment-service/**
+            filters:
+              - AuthorizationHeaderFilter
           - id: food-service
             uri: lb://food-service
             predicates:
               - Path=/api/food-service/**
+            filters:
+              - AuthorizationHeaderFilter
           - id: exercise-service
             uri: lb://exercise-service
             predicates:
               - Path=/api/exercise-service/**
+            filters:
+              - AuthorizationHeaderFilter
           - id: checklist-service
             uri: lb://checklist-service
             predicates:
               - Path=/api/checklist-service/**
+            filters:
+              - AuthorizationHeaderFilter
           - id: dashboard-service
             uri: lb://dashboard-service
             predicates:
               - Path=/api/dashboard-service/**
+            filters:
+              - AuthorizationHeaderFilter
 
 
 eureka:
@@ -51,3 +87,6 @@ eureka:
 
 shop:
   message: E-shop
+
+token:
+  secret:
