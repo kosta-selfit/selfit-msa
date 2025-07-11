@@ -13,4 +13,5 @@ public class ResGetBoards {
 	private String boardTitle;
 	private String categoryName;
 	private int totalCount;
+	private String nickName;
 }

@@ -35,3 +35,6 @@ eureka:
 
 shop:
   message: E-shop
+
+member_service:
+  url: http://member-service/api/member-service/member/%s

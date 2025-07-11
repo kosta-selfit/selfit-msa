@@ -1,4 +1,4 @@
-package com.oopsw.boardservice.dto;
+package com.oopsw.commentservie.dto;
 
 import java.io.Serializable;
 
@@ -8,4 +8,5 @@ import lombok.Data;
 public class MemberDto implements Serializable {
 	private String memberId;
 	private String nickname;
+	private String profileImg;
 }
