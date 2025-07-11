@@ -5,14 +5,21 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.coyote.Response;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.oopsw.boardservice.dto.BoardDto;
+import com.oopsw.boardservice.dto.MemberDto;
 import com.oopsw.boardservice.jpa.BoardEntity;
 import com.oopsw.boardservice.jpa.BoardRepository;
 import com.oopsw.boardservice.jpa.BookmarkEntity;
@@ -29,6 +36,8 @@ public class BoardServiceImpl implements BoardService {
 	private final BoardRepository boardRepository;
 	private final BookmarkRepository bookmarkRepository;
 	private final ModelMapper modelMapper;
+	private final Environment environment;
+	private final RestTemplate restTemplate;
 
 	private void validateBoardRequiredFields(BoardDto boardDto) {
 		if (boardDto.getBoardTitle() == null || boardDto.getBoardTitle().isBlank()) {
@@ -44,6 +53,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public BoardDto getBoard(BoardDto boardDto) {
+		// 게시글 조회 및 조회수 증가
 		BoardEntity boardEntity = boardRepository.findByBoardId(boardDto.getBoardId())
 			.orElseThrow(() ->
 				new IllegalArgumentException("게시글이 존재하지 않습니다.")
@@ -52,6 +62,15 @@ public class BoardServiceImpl implements BoardService {
 		boardRepository.save(boardEntity);
 
 		BoardDto resultBoard = modelMapper.map(boardEntity, BoardDto.class);
+
+		// member-service 통신
+		String url = String.format(environment.getProperty("member_service.url"), boardDto.getMemberId());
+		resultBoard.setNickName(
+			restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<MemberDto>() {})
+				.getBody()
+				.getNickname()
+		);
+
 		return resultBoard;
 	}
 
@@ -87,6 +106,15 @@ public class BoardServiceImpl implements BoardService {
 				BoardDto boardDto = modelMapper
 					.map(entity, BoardDto.class);
 				boardDto.setTotalCount(totalBoards);
+
+				// member-service 통신
+				String url = String.format(environment.getProperty("member_service.url"), boardDto.getMemberId());
+				boardDto.setNickName(
+					restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<MemberDto>() {})
+						.getBody()
+						.getNickname()
+				);
+
 				return boardDto;
 			})
 			.collect(Collectors.toList());
