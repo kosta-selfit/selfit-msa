@@ -6,22 +6,6 @@ spring:
     name: apigateway-service
 
   cloud:
-#    default-filters:
-#      - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
-#    globalcors:
-#      cors-configurations:
-#        '[/**]':
-#          allowedOrigins:
-#            - 'http://localhost:5173'  # 프론트엔드 주소 (개발 환경)
-#          allow-credentials: true
-#          allowedHeaders: '*'
-#          allowedMethods:
-#            - GET
-#            - POST
-#            - PUT
-#            - DELETE
-#            - OPTIONS
-
     gateway.server.webflux:
       routes:
           - id: member-service
