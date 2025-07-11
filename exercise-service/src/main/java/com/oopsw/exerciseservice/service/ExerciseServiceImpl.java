@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -46,7 +47,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 			.met(exerciseDto.getMet())
 			.memberId(exerciseDto.getMemberId())
 			.exerciseDate(exerciseDto.getExerciseDate())
-			.exerciseId(String.format("e%04d", count))
+			.exerciseId(UUID.randomUUID().toString())
 			.exerciseKcal(kcal)
 			.build();
 
