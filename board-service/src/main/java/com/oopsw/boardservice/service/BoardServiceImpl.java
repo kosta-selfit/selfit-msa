@@ -1,8 +1,8 @@
 package com.oopsw.boardservice.service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -105,14 +105,14 @@ public class BoardServiceImpl implements BoardService {
 	public void addBoard(BoardDto boardDto) {
 		validateBoardRequiredFields(boardDto);
 
-		String lastId = boardRepository.findTopByOrderByBoardIdDesc()
-			.map(BoardEntity::getBoardId).orElse("b0000");
+		// String lastId = boardRepository.findTopByOrderByBoardIdDesc()
+		// 	.map(BoardEntity::getBoardId).orElse("b0000");
+		//
+		// int seq = Integer.parseInt(lastId.substring(1)) + 1;
+		//
+		// String newBoardId = String.format("b%04d", seq);
 
-		int seq = Integer.parseInt(lastId.substring(1)) + 1;
-
-		String newBoardId = String.format("b%04d", seq);
-
-		boardDto.setBoardId(newBoardId);
+		boardDto.setBoardId(UUID.randomUUID().toString());
 		BoardEntity entity = modelMapper.map(boardDto, BoardEntity.class);
 		boardRepository.save(entity);
 	}
