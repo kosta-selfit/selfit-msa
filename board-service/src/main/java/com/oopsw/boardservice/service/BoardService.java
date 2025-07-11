@@ -6,13 +6,17 @@ import com.oopsw.boardservice.dto.BoardDto;
 
 public interface BoardService {
 
-	BoardDto getBoard(String boardId);
+	BoardDto getBoard(BoardDto boardDto);
 
 	List<BoardDto> getBoards(int page, String categoryName, String sortOrder, String keyword);
 
 	void addBoard(BoardDto boardDto);
 
 	void setBoard(BoardDto boardDto);
+
+	void removeBoard(BoardDto boardDto);
+
+	void toggleBookmark(BoardDto boardDto);
 
 	// BoardDto getBoardTotal();
 }
