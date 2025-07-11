@@ -77,11 +77,12 @@ public class ChecklistServiceImpl implements ChecklistService {
 	}
 
 	@Override
-	public void addChecklist(ChecklistDto checklistDto) {
+	public String addChecklist(ChecklistDto checklistDto) {
 		// int count = (checklistRepository.findAll().size()) + 1;
 		// checklistDto.setChecklistId(String.format("Ch%03d", count));
 		checklistDto.setChecklistId(UUID.randomUUID().toString());
 		checklistRepository.save(modelMapper.map(checklistDto, ChecklistEntity.class));
+		return checklistDto.getChecklistId();
 	}
 }
 

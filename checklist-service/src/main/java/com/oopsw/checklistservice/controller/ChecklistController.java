@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.oopsw.checklistservice.vo.request.ReqGetChecklist;
 import com.oopsw.checklistservice.vo.request.ReqRemoveChecklist;
 import com.oopsw.checklistservice.vo.request.ReqSetCheckItem;
 import com.oopsw.checklistservice.vo.request.ReqSetIsCheckItem;
+import com.oopsw.checklistservice.vo.response.ResAddChecklist;
 import com.oopsw.checklistservice.vo.response.ResGetChecklist;
 import com.oopsw.checklistservice.vo.response.ResMessage;
 
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/checklist-service")
+@CrossOrigin(origins = "http://127.0.0.1:8880")
 public class ChecklistController {
 	private final ChecklistService checklistService;
 	private final ModelMapper modelMapper;
@@ -81,12 +84,12 @@ public class ChecklistController {
 	}
 
 	@PostMapping("/item/member/{memberId}")
-	public ResponseEntity<ResMessage> addChecklist(@PathVariable String memberId,
+	public ResponseEntity<ResAddChecklist> addChecklist(@PathVariable String memberId,
 		@RequestBody ReqAddCheckList reqAddCheckList) {
 		ChecklistDto checkListDto = modelMapper.map(reqAddCheckList, ChecklistDto.class);
 		checkListDto.setMemberId(memberId);
-		checklistService.addChecklist(checkListDto);
-		return ResponseEntity.ok(new ResMessage("success"));
+		String checklistId = checklistService.addChecklist(checkListDto);
+		return ResponseEntity.ok(new ResAddChecklist(checklistId));
 	}
 
 }

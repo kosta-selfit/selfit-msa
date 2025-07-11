@@ -8,7 +8,7 @@ public interface ChecklistService {
 
 	List<ChecklistDto> getChecklists(ChecklistDto checklistDto);
 
-	void addChecklist(ChecklistDto checklistDto);
+	String addChecklist(ChecklistDto checklistDto);
 
 	void removeChecklist(ChecklistDto checklistDto);
 
