@@ -14,5 +14,6 @@ public class ResGetMember {
 	private Float height;
 	private Float weight;
 	private String goal;
+	private String profileImg;
 	private Float bmr;
 }
