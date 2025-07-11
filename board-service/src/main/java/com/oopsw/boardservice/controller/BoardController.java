@@ -50,7 +50,7 @@ public class BoardController {
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
-	@GetMapping("/{page}/{categoryName}/list/{sortOrder}/{keyword}")
+	@GetMapping("/list/{page}/{categoryName}/{sortOrder}/{keyword}")
 	public ResponseEntity<List<ResGetBoards>> getBoards(@PathVariable int page,
 													@PathVariable String categoryName,
 													@PathVariable String sortOrder,
