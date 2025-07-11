@@ -7,6 +7,8 @@ public interface MemberService {
 
 	MemberDto getMember(String memberId);
 
+	MemberDto getMemberByEmail(String email);
+
 	void setMember(MemberDto memberDto);
 
 	void removeMember(String memberId);

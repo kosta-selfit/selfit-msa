@@ -40,14 +40,14 @@ public class AuthorizationHeaderFilter
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
+            String headerString = JwtProperties.HEADER_STRING;
 
-            if (!request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
+            if (!request.getHeaders().containsKey(headerString)) {
                 return onError(exchange, "No authorization header", HttpStatus.UNAUTHORIZED);
             }
 
-            String authorizationHeader = request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0);
+            String authorizationHeader = request.getHeaders().get(headerString).get(0);
             String jwt = authorizationHeader.replace("Bearer ", "");
-
             if (!isJwtValid(jwt)) {
                 return onError(exchange, "JWT token is not valid", HttpStatus.UNAUTHORIZED);
             }
