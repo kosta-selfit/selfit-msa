@@ -3,6 +3,7 @@ package com.oopsw.checklistservice.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -77,8 +78,9 @@ public class ChecklistServiceImpl implements ChecklistService {
 
 	@Override
 	public void addChecklist(ChecklistDto checklistDto) {
-		int count = (checklistRepository.findAll().size()) + 1;
-		checklistDto.setChecklistId(String.format("Ch%03d", count));
+		// int count = (checklistRepository.findAll().size()) + 1;
+		// checklistDto.setChecklistId(String.format("Ch%03d", count));
+		checklistDto.setChecklistId(UUID.randomUUID().toString());
 		checklistRepository.save(modelMapper.map(checklistDto, ChecklistEntity.class));
 	}
 }

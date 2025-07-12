@@ -7,6 +7,9 @@ import lombok.Data;
 @Data
 public class ResGetComments {
 	private String commentContent;
-	private Date commentCreatedDate;
+	private Date createdDate;
 	private String memberId;
+
+	private String nickname;
+	private String profileImg;
 }

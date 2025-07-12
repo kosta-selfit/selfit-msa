@@ -43,6 +43,15 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
+	public MemberDto getMemberByEmail(String email) {
+		MemberEntity memberEntity = memberRepository.findByEmail(email);
+		if (memberEntity == null) {
+			throw new NullPointerException("Member not found");
+		}
+		return new ModelMapper().map(memberEntity, MemberDto.class);
+	}
+
+	@Override
 	@Transactional
 	public void setMember(MemberDto memberDto) {
 		MemberEntity memberEntity = memberRepository.findByMemberId(memberDto.getMemberId());

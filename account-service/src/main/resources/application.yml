@@ -2,13 +2,26 @@ server:
   port: 7001
 
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_ID}
+            client-secret: ${GOOGLE_SECRET}
+            redirect-uri: "http://127.0.0.1:8881/login/oauth2/code/google"
+            scope:
+              - profile
+              - email
   application:
     name: member-service
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://34.47.102.46:3306/selfit?characterEncoding=UTF-8
-    username: kosta
-    password: hr7292
+    url: jdbc:mariadb://${DB_IP}:3306/${DB_NAME}?characterEncoding=UTF-8
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   #  h2:
   #    console:
@@ -32,6 +45,7 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://127.0.0.1:8761/eureka
+
 
 shop:
   message: E-shop
