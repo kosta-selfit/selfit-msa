@@ -10,12 +10,20 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.oopsw.exerciseservice.dto.ExerciseDto;
+import com.oopsw.exerciseservice.dto.MemberDto;
 import com.oopsw.exerciseservice.jpa.ExerciseEntity;
+import com.oopsw.exerciseservice.jpa.ExerciseTotalEntity;
 import com.oopsw.exerciseservice.repository.ExerciseRepository;
 import com.oopsw.exerciseservice.repository.ExerciseApiRepository;
+import com.oopsw.exerciseservice.repository.ExerciseTotalRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,21 +36,25 @@ import reactor.core.publisher.Mono;
 public class ExerciseServiceImpl implements ExerciseService {
 
 	private final ExerciseRepository exerciseRepository;
+	private final ExerciseTotalRepository exerciseTotalRepository;
 	private final ExerciseApiRepository exerciseApiRepository;
+	private final Environment environment;
+	private final RestTemplate restTemplate;
 
 	@Override
 	public void addExercise(ExerciseDto exerciseDto) {
-		// 소모 칼로리 계산(Member에서 Weight 가져와야 함.
-		float kcal = 70  //dashboardRepository.getWeight(exercise.getExerciseNoteId())
+
+		String memberUrl = String.format(environment.getProperty("member-service.url"), exerciseDto.getMemberId());
+		ResponseEntity<MemberDto> memberDto = restTemplate.exchange(memberUrl, HttpMethod.GET, null, MemberDto.class);
+		MemberDto memberInfo = memberDto.getBody();
+
+		float kcal = memberInfo.getWeight()
 			* exerciseDto.getMet()
 			* exerciseDto.getExerciseMin() / 60f;
 
-
-		int count = (exerciseRepository.findAll().size())+1;
 		// DTO → Entity 매핑
 		ExerciseEntity exerciseEntity = ExerciseEntity.builder()
 			.exerciseMin(exerciseDto.getExerciseMin())
-			// .exerciseKcal(kcal)
 			.exerciseName(exerciseDto.getExerciseName())
 			.met(exerciseDto.getMet())
 			.memberId(exerciseDto.getMemberId())
@@ -53,6 +65,22 @@ public class ExerciseServiceImpl implements ExerciseService {
 
 		// JPA 저장
 		exerciseRepository.save(exerciseEntity);
+
+		if(exerciseTotalRepository.existsByMemberIdAndExerciseDate(exerciseEntity.getMemberId(), exerciseEntity.getExerciseDate())) {
+			ExerciseTotalEntity exerciseTotalEntity = exerciseTotalRepository.findByMemberIdAndExerciseDate(exerciseEntity.getMemberId(), exerciseEntity.getExerciseDate());
+			exerciseTotalEntity.setExerciseTotalKcal(exerciseTotalEntity.getExerciseTotalKcal() + kcal);
+			exerciseTotalRepository.save(exerciseTotalEntity);
+		}
+		else {
+			ExerciseTotalEntity exerciseTotalEntity = ExerciseTotalEntity.builder()
+				.exerciseTotalId(UUID.randomUUID().toString())
+				.exerciseTotalKcal(kcal)
+				.exerciseDate(exerciseDto.getExerciseDate())
+				.memberId(exerciseEntity.getMemberId())
+				.build();
+			exerciseTotalRepository.save(exerciseTotalEntity);
+		}
+
 	}
 
 	@Override
@@ -82,8 +110,13 @@ public class ExerciseServiceImpl implements ExerciseService {
 			.memberId(exerciseDto.getMemberId())
 			.exerciseId(exerciseDto.getExerciseId())
 			.build();
+		ExerciseEntity exercise = exerciseRepository.findByMemberIdAndExerciseId(exerciseDto.getMemberId(), exerciseDto.getExerciseId());
+		ExerciseTotalEntity exerciseTotalEntity = exerciseTotalRepository.findByMemberIdAndExerciseDate(exerciseDto.getMemberId(), exercise.getExerciseDate());
+
 		if (exerciseRepository.existsByMemberIdAndExerciseId(exerciseEntity.getMemberId(), exerciseEntity.getExerciseId())) {
 			exerciseRepository.deleteByMemberIdAndExerciseId(exerciseDto.getMemberId(), exerciseEntity.getExerciseId());
+			exerciseTotalEntity.setExerciseTotalKcal(exerciseTotalEntity.getExerciseTotalKcal() - exercise.getExerciseKcal());
+			exerciseTotalRepository.save(exerciseTotalEntity);
 		}
 	}
 
@@ -95,14 +128,28 @@ public class ExerciseServiceImpl implements ExerciseService {
 			.build();
 		ExerciseEntity exercise = exerciseRepository.findByExerciseId(exerciseEntity.getExerciseId());
 
+		float beforeKcal = exercise.getExerciseKcal();
 		exercise.setExerciseMin(exerciseDto.getNewMin());
 
-		float weight = 70.0f; // member weight
+		String memberUrl = String.format(environment.getProperty("member-service.url"), exerciseDto.getMemberId());
+		ResponseEntity<MemberDto> memberDto = restTemplate.exchange(memberUrl, HttpMethod.GET, null, MemberDto.class);
+		MemberDto memberInfo = memberDto.getBody();
+
+		float weight = memberInfo.getWeight();
 		float met = exercise.getMet();
 		float kcal = weight * met * exerciseDto.getNewMin() / 60f;
 
 		exercise.setExerciseKcal(kcal);
 		exerciseRepository.save(exercise);
+
+		ExerciseTotalEntity exerciseTotalEntity = ExerciseTotalEntity.builder()
+			.memberId(exerciseDto.getMemberId())
+			.exerciseDate(exercise.getExerciseDate())
+			.build();
+
+		ExerciseTotalEntity exerciseTotalEntityafter = exerciseTotalRepository.findByMemberIdAndExerciseDate(exerciseTotalEntity.getMemberId(), exerciseTotalEntity.getExerciseDate());
+		exerciseTotalEntityafter.setExerciseTotalKcal(exerciseTotalEntityafter.getExerciseTotalKcal()+(kcal-beforeKcal));
+		exerciseTotalRepository.save(exerciseTotalEntityafter);
 	}
 
 	@Override
@@ -122,6 +169,44 @@ public class ExerciseServiceImpl implements ExerciseService {
 		return resultDto;
 	}
 
+	@Override
+	public List<ExerciseDto> getYearExerciseAvgAll(ExerciseDto exerciseDto) {
+		String memberUrl = String.format(environment.getProperty("member-service.like.url"), exerciseDto.getMemberId());
+		ResponseEntity<List<MemberDto>> memberDto = restTemplate.exchange(memberUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<MemberDto>>() {  });
+		List<MemberDto> memberIds = memberDto.getBody();
+
+		Map<LocalDate, List<Float>> dateToKcalList = new TreeMap<>();
+
+		for(MemberDto member : memberIds) {
+			ExerciseDto perMemberDto = ExerciseDto.builder()
+				.year(exerciseDto.getYear())
+				.memberId(member.getMemberId())
+				.build();
+
+			List<ExerciseDto> oneMemberData = getYearExerciseKcal(perMemberDto);
+
+			for(ExerciseDto daily : oneMemberData) {
+				dateToKcalList.computeIfAbsent(daily.getExerciseDate(), k -> new ArrayList<>())
+					.add(daily.getExerciseSum());
+			}
+		}
+
+		List<ExerciseDto> resultDtos = dateToKcalList.entrySet().stream()
+			.map(entry -> {
+				LocalDate date = entry.getKey();
+				List<Float> kcals = entry.getValue();
+				float average = (float) kcals.stream().mapToDouble(Float::doubleValue).average().orElse(0.0);
+				return ExerciseDto.builder()
+					.exerciseDate(date)
+					.exerciseAvg(average)
+					.build();
+			}).collect(Collectors.toList());
+
+		return resultDtos;
+	}
+
+
+	@Override
 	public List<ExerciseDto> getYearExerciseKcal(ExerciseDto exerciseDto) {
 		ExerciseEntity exerciseEntity = ExerciseEntity.builder()
 			.memberId(exerciseDto.getMemberId())

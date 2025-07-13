@@ -21,12 +21,14 @@ import com.oopsw.exerciseservice.vo.request.ReqAddExercise;
 import com.oopsw.exerciseservice.vo.request.ReqGetExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqGetExerciseOpenSearch;
 import com.oopsw.exerciseservice.vo.request.ReqGetExercises;
+import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseAvgAll;
 import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqRemoveExercise;
 import com.oopsw.exerciseservice.vo.request.ReqSetExerciseMin;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseOpenSearch;
 import com.oopsw.exerciseservice.vo.response.ResGetExercises;
+import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseAvgAll;
 import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResMessage;
 
@@ -131,6 +133,25 @@ public class ExerciseController {
 		return ResponseEntity.ok(resGetYearExerciseKcals);
 	}
 
+	@PostMapping("/avg/year/member/{memberId}")
+	public ResponseEntity<List<ResGetYearExerciseAvgAll>> getYearExerciseAvgAll(@RequestBody ReqGetYearExerciseAvgAll reqGetYearExerciseAvgAll, @PathVariable String memberId) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.memberId(memberId)
+			.year(reqGetYearExerciseAvgAll.getYear())
+			.build();
+
+		List<ExerciseDto> avgPerDate = exerciseService.getYearExerciseAvgAll(exerciseDto);
+
+		List<ResGetYearExerciseAvgAll> responseList = avgPerDate.stream()
+			.map(dto -> ResGetYearExerciseAvgAll.builder()
+				.exerciseDate(dto.getExerciseDate().toString())
+				.avgExerciseKcal(dto.getExerciseAvg())
+				.build())
+			.toList();
+
+		return ResponseEntity.ok(responseList);
+	}
+
 	@PostMapping("/open-search")
 	public ResponseEntity<Mono<List<ResGetExerciseOpenSearch>>> getExerciseOpenSearch(@RequestBody ReqGetExerciseOpenSearch reqGetExerciseOpenSearch) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
@@ -151,4 +172,6 @@ public class ExerciseController {
 		);
 		return ResponseEntity.ok(resGetExerciseOpenSearch);
 	}
+
+
 }

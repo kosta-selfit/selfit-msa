@@ -1,5 +1,7 @@
 package com.oopsw.memberservice.service;
 
+import java.util.List;
+
 import com.oopsw.memberservice.dto.MemberDto;
 
 public interface MemberService {
@@ -18,4 +20,6 @@ public interface MemberService {
 	Boolean checkNickname(MemberDto memberDto);
 
 	Boolean checkPw(MemberDto memberDto);
+
+	List<MemberDto> getMemberLike(MemberDto memberDto);
 }
