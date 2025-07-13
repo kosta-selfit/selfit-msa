@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,8 +65,9 @@ public class MemberServiceImpl implements MemberService {
 			memberDto.setPw(passwordEncoder.encode(memberDto.getPw()));
 		}
 		memberDto.setBmr(calculateBmr(memberDto));
-
-		new ModelMapper().map(memberDto, memberEntity);
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		modelMapper.map(memberDto, memberEntity);
 		memberEntity.setId(id);
 	}
 
