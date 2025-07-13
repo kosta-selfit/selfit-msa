@@ -8,15 +8,22 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import com.oopsw.foodservice.dto.FoodApiDto;
 import com.oopsw.foodservice.dto.FoodDto;
+import com.oopsw.foodservice.dto.MemberDto;
 import com.oopsw.foodservice.jpa.FoodEntity;
 import com.oopsw.foodservice.jpa.FoodTotalEntity;
 import com.oopsw.foodservice.repository.FoodApiRepository;
@@ -33,6 +40,8 @@ public class FoodServiceImpl implements FoodService {
 	private final FoodApiRepository foodApiRepository;
 	private final ModelMapper modelMapper;
 	private final FoodTotalRepository foodTotalRepository;
+	private final RestTemplate restTemplate;
+	private final Environment environment;
 
 	@Override
 	public Mono<List<FoodApiDto>> getFoodByNameLike(FoodApiDto foodApiDto) {
@@ -97,6 +106,42 @@ public class FoodServiceImpl implements FoodService {
 		foodDtoList.sort(Comparator.comparing(FoodDto::getIntakeDate));
 
 		return foodDtoList;
+	}
+
+	public List<FoodDto> getYearIntakeAvgAll(FoodDto foodDto) {
+		String memberUrl = String.format(environment.getProperty("member-service.like.url"), foodDto.getMemberId());
+		ResponseEntity<List<MemberDto>> memberDto = restTemplate.exchange(memberUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<MemberDto>>() {  });
+		List<MemberDto> memberIds = memberDto.getBody();
+
+		Map<LocalDate, List<Float>> dateToKcalList = new TreeMap<>();
+
+		for(MemberDto member : memberIds) {
+			FoodDto perMemberDto = FoodDto.builder()
+				.year(foodDto.getYear())
+				.memberId(member.getMemberId())
+				.build();
+
+			List<FoodDto> oneMemberData = getYearIntakeKcal(perMemberDto);
+
+			for(FoodDto daily : oneMemberData) {
+				LocalDate localDate = daily.getIntakeDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+				dateToKcalList.computeIfAbsent(localDate, k -> new ArrayList<>())
+					.add(daily.getIntakeKcalSum());
+			}
+		}
+
+		List<FoodDto> resultDtos = dateToKcalList.entrySet().stream()
+			.map(entry -> {
+				LocalDate date = entry.getKey();
+				List<Float> kcals = entry.getValue();
+				float average = (float) kcals.stream().mapToDouble(Float::doubleValue).average().orElse(0.0);
+				return FoodDto.builder()
+					.intakeDateLocal(date)
+					.intakeAvg(average)
+					.build();
+			}).collect(Collectors.toList());
+
+		return resultDtos;
 	}
 
 	@Override
