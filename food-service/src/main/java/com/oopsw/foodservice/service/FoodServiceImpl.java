@@ -1,6 +1,7 @@
 package com.oopsw.foodservice.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -17,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.oopsw.foodservice.dto.FoodApiDto;
 import com.oopsw.foodservice.dto.FoodDto;
 import com.oopsw.foodservice.jpa.FoodEntity;
+import com.oopsw.foodservice.jpa.FoodTotalEntity;
 import com.oopsw.foodservice.repository.FoodApiRepository;
 import com.oopsw.foodservice.repository.FoodRepository;
+import com.oopsw.foodservice.repository.FoodTotalRepository;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -29,6 +32,7 @@ public class FoodServiceImpl implements FoodService {
 	private final FoodRepository foodRepository;
 	private final FoodApiRepository foodApiRepository;
 	private final ModelMapper modelMapper;
+	private final FoodTotalRepository foodTotalRepository;
 
 	@Override
 	public Mono<List<FoodApiDto>> getFoodByNameLike(FoodApiDto foodApiDto) {
@@ -112,6 +116,29 @@ public class FoodServiceImpl implements FoodService {
 		foodEntity.setFoodId(UUID.randomUUID().toString());
 		foodEntity.setIntakeKcal(foodDto.getIntake()/100f*foodDto.getUnitKcal());
 		foodRepository.save(foodEntity);
+
+		LocalDate localDate = foodEntity.getIntakeDate().toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
+
+		if(foodTotalRepository.existsByMemberIdAndIntakeDate(foodEntity.getMemberId(), localDate)) {
+			FoodTotalEntity foodTotalEntity = foodTotalRepository.findByMemberIdAndIntakeDate(foodEntity.getMemberId(), localDate);
+			foodTotalEntity.setFoodTotalKcal(foodTotalEntity.getFoodTotalKcal() + foodEntity.getIntakeKcal());
+
+			foodTotalEntity.setIntakeDate(localDate);
+			foodTotalRepository.save(foodTotalEntity);
+		}
+		else {
+			FoodTotalEntity foodTotalEntity = FoodTotalEntity.builder()
+				.foodTotalId(UUID.randomUUID().toString())
+				.foodTotalKcal(foodDto.getIntake()/100f*foodDto.getUnitKcal())
+				.memberId(foodEntity.getMemberId())
+				.intakeDate(localDate)
+				.build();
+			foodTotalRepository.save(foodTotalEntity);
+		}
+
+
 		return foodDto;
 	}
 
@@ -119,24 +146,47 @@ public class FoodServiceImpl implements FoodService {
 	@Transactional
 	public FoodDto setFood(FoodDto foodDto) {
 		FoodEntity foodEntity = foodRepository.findByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
-
+		float beforeIntakekcal = foodEntity.getIntakeKcal();
 		if(foodEntity == null) {
 			throw new IllegalArgumentException("Invalid foodId");
 		}
 
+		float intakeKcal = foodDto.getIntake()/100f*foodEntity.getUnitKcal();
 		foodEntity.setIntake(foodDto.getIntake());
-		foodEntity.setIntakeKcal(foodDto.getIntake()/100f*foodEntity.getUnitKcal());
+		foodEntity.setIntakeKcal(intakeKcal);
 		foodRepository.save(foodEntity);
+
+		LocalDate localDate = foodEntity.getIntakeDate().toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
+
+		FoodTotalEntity foodTotalEntity = FoodTotalEntity.builder()
+			.memberId(foodDto.getMemberId())
+			.intakeDate(localDate)
+			.build();
+
+		FoodTotalEntity foodTotalEntityafter = foodTotalRepository.findByMemberIdAndIntakeDate(foodTotalEntity.getMemberId(), foodTotalEntity.getIntakeDate());
+		foodTotalEntityafter.setFoodTotalKcal(foodTotalEntityafter.getFoodTotalKcal() + (intakeKcal - beforeIntakekcal));
+		foodTotalRepository.save(foodTotalEntityafter);
 		return foodDto;
 	}
 
 	@Override
 	@Transactional
 	public void removeFood(FoodDto foodDto) {
+		FoodEntity foodEntityDateIntakeKcal = foodRepository.findByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
+		LocalDate localDate = foodEntityDateIntakeKcal.getIntakeDate().toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
+		FoodTotalEntity foodTotalEntity = foodTotalRepository.findByMemberIdAndIntakeDate(foodDto.getMemberId(), localDate);
+
 		int foodEntity = foodRepository.deleteByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
+		foodTotalEntity.setFoodTotalKcal(foodTotalEntity.getFoodTotalKcal()-foodEntityDateIntakeKcal.getIntakeKcal());
+		foodTotalRepository.save(foodTotalEntity);
 
 		if(foodEntity == 0) {
 			throw new IllegalArgumentException("Invalid memberId or foodId");
 		}
+
 	}
 }

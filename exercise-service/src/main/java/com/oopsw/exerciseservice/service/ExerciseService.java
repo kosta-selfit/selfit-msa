@@ -15,5 +15,6 @@ public interface ExerciseService {
 	void setExerciseMin(ExerciseDto exerciseDto);
 	ExerciseDto getExerciseKcal(ExerciseDto exerciseDto);
 	List<ExerciseDto> getYearExerciseKcal(ExerciseDto exerciseDto);
+	List<ExerciseDto> getYearExerciseAvgAll(ExerciseDto exerciseDto);
 	Mono<List<ExerciseDto>> getExerciseOpenSearch(ExerciseDto exerciseDto);
 }
