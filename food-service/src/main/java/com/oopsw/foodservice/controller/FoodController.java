@@ -55,6 +55,25 @@ public class FoodController {
 		return ResponseEntity.ok(result);
 	}
 
+	@PostMapping("/avg/year/member/{memberId}")
+	public ResponseEntity<List<ResGetYearExerciseAvgAll>> getYearExerciseAvgAll(@RequestBody ReqGetYearExerciseAvgAll reqGetYearExerciseAvgAll, @PathVariable String memberId) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.memberId(memberId)
+			.year(reqGetYearExerciseAvgAll.getYear())
+			.build();
+
+		List<ExerciseDto> avgPerDate = exerciseService.getYearExerciseAvgAll(exerciseDto);
+
+		List<ResGetYearExerciseAvgAll> responseList = avgPerDate.stream()
+			.map(dto -> ResGetYearExerciseAvgAll.builder()
+				.exerciseDate(dto.getExerciseDate().toString())
+				.avgExerciseKcal(dto.getExerciseAvg())
+				.build())
+			.toList();
+
+		return ResponseEntity.ok(responseList);
+	}
+
 	@PostMapping("/kcal/year/member/{memberId}")
 	public ResponseEntity<List<ResGetYearIntakeKcal>> getYearIntakeKcal(@PathVariable String memberId, @RequestBody ReqGetYearIntakeKcal reqGetYearIntakeKcal) {
 		FoodDto foodDto = modelMapper.map(reqGetYearIntakeKcal, FoodDto.class);
@@ -68,6 +87,8 @@ public class FoodController {
 		}
 		return ResponseEntity.ok(result);
 	}
+
+
 
 	@PostMapping("/foods/member/{memberId}")
 	public ResponseEntity<List<ResGetFood>> getFood(@PathVariable("memberId") String memberId, @RequestBody ReqGetFood reqGetFood) {
