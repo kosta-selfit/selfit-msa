@@ -15,7 +15,10 @@ public class CommentDto {
 	private Long id;
 	private String commentId;
 	private String commentContent;
-	private Date commentCreatedDate;
+	private Date createdDate;
 	private String memberId;
 	private String boardId;
+
+	private String nickname;
+	private String profileImg;
 }
