@@ -42,3 +42,7 @@ shop:
 food:
   base-url: http://api.data.go.kr/openapi/tn_pubr_public_nutri_process_info_api
   key: ${FOODAPI_KEY}
+
+member-service:
+  like:
+    url: http://member-service/api/member-service/like/member/%s

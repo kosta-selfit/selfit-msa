@@ -1,5 +1,6 @@
 package com.oopsw.foodservice.dto;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -18,9 +19,10 @@ public class FoodDto {
 	private String foodName;
 	private Float intake;
 	private Float intakeKcal;
+	private Float intakeAvg;
 	private Integer unitKcal;
 	private String memberId;
-
+	private LocalDate intakeDateLocal;
 	private Float intakeKcalSum;
 	private int year;
 }

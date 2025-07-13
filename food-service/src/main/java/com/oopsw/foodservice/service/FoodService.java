@@ -15,4 +15,5 @@ public interface FoodService {
 	FoodDto setFood(FoodDto foodDto);
 	void removeFood(FoodDto foodDto);
 	Mono<List<FoodApiDto>> getFoodByNameLike(FoodApiDto foodApiDto);
+	List<FoodDto> getYearIntakeAvgAll(FoodDto foodDto);
 }
