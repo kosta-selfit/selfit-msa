@@ -42,7 +42,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 	private final RestTemplate restTemplate;
 
 	@Override
-	public void addExercise(ExerciseDto exerciseDto) {
+	public String addExercise(ExerciseDto exerciseDto) {
 
 		String memberUrl = String.format(environment.getProperty("member-service.url"), exerciseDto.getMemberId());
 		ResponseEntity<MemberDto> memberDto = restTemplate.exchange(memberUrl, HttpMethod.GET, null, MemberDto.class);
@@ -80,7 +80,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 				.build();
 			exerciseTotalRepository.save(exerciseTotalEntity);
 		}
-
+		return exerciseDto.getExerciseId();
 	}
 
 	@Override
@@ -93,6 +93,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 		List<ExerciseDto> exerciseDtos = new ArrayList<>();
 		for (ExerciseEntity exerciseEntity1 : exerciseEntities) {
 			ExerciseDto dto = ExerciseDto.builder()
+				.exerciseId(exerciseEntity1.getExerciseId())
 				.exerciseName(exerciseEntity1.getExerciseName())
 				.exerciseDate(exerciseEntity1.getExerciseDate())
 				.exerciseMin(exerciseEntity1.getExerciseMin())
