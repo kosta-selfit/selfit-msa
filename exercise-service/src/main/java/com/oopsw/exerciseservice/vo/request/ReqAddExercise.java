@@ -8,7 +8,6 @@ import lombok.Data;
 @Data
 public class ReqAddExercise {
 	private LocalDate exerciseDate;
-	private String memberId;
 	private String exerciseName;
 	private int exerciseMin;
 	private float met;
