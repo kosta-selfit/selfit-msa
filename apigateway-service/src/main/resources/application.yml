@@ -15,13 +15,23 @@ spring:
               - Method=POST
             filters:
               - RemoveRequestHeader=Cookie
+
           - id: member-service
             uri: lb://member-service
             predicates:
-              - Path=/api/member-service/member
+              - Path=/api/member-service/member/**
               - Method=POST
             filters:
               - RemoveRequestHeader=Cookie
+
+          - id: member-service
+            uri: lb://member-service
+            predicates:
+              - Path=/api/member-service/member/**
+            filters:
+              - RemoveRequestHeader=Cookie
+              - AuthorizationHeaderFilter
+
           - id: board-service
             uri: lb://board-service
             predicates:
