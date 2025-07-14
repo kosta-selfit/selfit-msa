@@ -33,7 +33,7 @@ public class MemberEntity {
 	@Column(name = "email", unique = true, nullable = false)
 	private String email;
 
-	@Column(name = "pw", nullable = false)
+	@Column(name = "pw")
 	private String pw;
 
 	@Column(name = "name")
