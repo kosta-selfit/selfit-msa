@@ -31,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/checklist-service")
-@CrossOrigin(origins = "http://127.0.0.1:8880")
 public class ChecklistController {
 	private final ChecklistService checklistService;
 	private final ModelMapper modelMapper;

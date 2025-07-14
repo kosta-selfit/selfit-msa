@@ -9,6 +9,7 @@ import lombok.Data;
 @Builder
 @Data
 public class ResGetExercises {
+	private String exerciseId;
 	private LocalDate exerciseDate;
 	private String exerciseName;
 	private int exerciseMin;

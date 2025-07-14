@@ -9,7 +9,7 @@ import com.oopsw.exerciseservice.dto.ExerciseDto;
 import reactor.core.publisher.Mono;
 
 public interface ExerciseService {
-	void addExercise(ExerciseDto exerciseDto);
+	String addExercise(ExerciseDto exerciseDto);
 	List<ExerciseDto> getExercises(ExerciseDto exerciseDto);
 	void removeExercise(ExerciseDto exerciseDto);
 	void setExerciseMin(ExerciseDto exerciseDto);

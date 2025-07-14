@@ -49,15 +49,15 @@ public class ExerciseController {
 	}
 
 	@PostMapping("/member/{memberId}")
-	public ResponseEntity<ResMessage> addExercise(@RequestBody ReqAddExercise reqAddExercise, @PathVariable String memberId) {
+	public ResponseEntity<ResAddExercise> addExercise(@RequestBody ReqAddExercise reqAddExercise, @PathVariable String memberId) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
 			.exerciseDate(reqAddExercise.getExerciseDate())
 			.exerciseMin(reqAddExercise.getExerciseMin())
 			.met(reqAddExercise.getMet())
 			.exerciseName(reqAddExercise.getExerciseName())
 			.memberId(memberId).build();
-		exerciseService.addExercise(exerciseDto);
-		return ResponseEntity.ok(new ResMessage("success"));
+		String exerciseId = exerciseService.addExercise(exerciseDto);
+		return ResponseEntity.ok(new ResAddExercise(exerciseId));
 	}
 
 	@PostMapping("/exercises/member/{memberId}")
@@ -70,6 +70,7 @@ public class ExerciseController {
 		List<ResGetExercises> resGetExercises = new ArrayList<>();
 		for (ExerciseDto exerciseDto1 : exerciseDtos) {
 			ResGetExercises resGetExercise = ResGetExercises.builder()
+				.exerciseId(exerciseDto1.getExerciseId())
 				.exerciseDate(exerciseDto1.getExerciseDate())
 				.exerciseKcal(exerciseDto1.getExerciseKcal())
 				.exerciseName(exerciseDto1.getExerciseName())
