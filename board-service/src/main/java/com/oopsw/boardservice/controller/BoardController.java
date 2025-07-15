@@ -1,5 +1,7 @@
 package com.oopsw.boardservice.controller;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,12 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.oopsw.boardservice.dto.BoardDto;
 import com.oopsw.boardservice.service.BoardService;
 import com.oopsw.boardservice.vo.request.ReqAddBoard;
 import com.oopsw.boardservice.vo.request.ReqSetBoard;
+import com.oopsw.boardservice.vo.response.ResBookmarks;
 import com.oopsw.boardservice.vo.response.ResGetBoard;
 import com.oopsw.boardservice.vo.response.ResGetBoards;
 import com.oopsw.boardservice.vo.response.ResMessage;
@@ -50,20 +54,28 @@ public class BoardController {
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
 
-	@GetMapping("/list/{page}/{categoryName}/{sortOrder}/{keyword}")
-	public ResponseEntity<List<ResGetBoards>> getBoards(@PathVariable int page,
-													@PathVariable String categoryName,
-													@PathVariable String sortOrder,
-													@PathVariable String keyword){
-		log.info("getBoards - page: {}, categoryId: {}, keyword: {}, sortOrder: {}", page, categoryName, keyword,
+	@GetMapping("/list")
+	public ResponseEntity<List<ResGetBoards>> getBoards(@RequestParam int page,
+														@RequestParam String categoryName,
+														@RequestParam String sortOrder,
+														@RequestParam String keyword){
+		log.info("getBoards - page: {}, categoryName: {}, keyword: {}, sortOrder: {}", page, categoryName, keyword,
 			sortOrder);
 
 		List<BoardDto> boardDto = boardService.getBoards(page, categoryName, sortOrder, keyword);
 		List<ResGetBoards> resGetBoard = boardDto.stream()
 			.map(dto -> modelMapper.map(dto, ResGetBoards.class))
 			.collect(Collectors.toList());
-		log.info("getBoards - resp: {}", resGetBoard);
 		return ResponseEntity.ok(resGetBoard);
+	}
+
+	@GetMapping("/bookmark/{page}")
+	public ResponseEntity<List<ResBookmarks>> getBookmarks(@PathVariable int page, @PathVariable String memberId){
+
+		log.info("getBookmarks - page: {}, memberId: {}", page, memberId);
+
+
+		return null;
 	}
 
 	@GetMapping("/{boardId}/member/{memberId}")
@@ -73,9 +85,10 @@ public class BoardController {
 			.boardId(boardId)
 			.memberId(memberId)
 			.build();
+		log.info("getBoard - memberId: {}, boardId: {}", memberId, boardId);
 
 		ResGetBoard resGetBoard =modelMapper.map(boardService.getBoard(boardDto), ResGetBoard.class);
-
+		log.info("resGetBoard - resGetBoard: {}", resGetBoard);
 		return ResponseEntity.ok(resGetBoard);
 	}
 
@@ -106,9 +119,9 @@ public class BoardController {
 			.boardId(boardId)
 			.memberId(memberId)
 			.build();
-		boardService.toggleBookmark(boardDto);
-
-		return ResponseEntity.ok(new ResMessage("success"));
+		System.out.println(boardDto);
+		Boolean isBookmark = boardService.toggleBookmark(boardDto);
+		return ResponseEntity.ok(new ResMessage(isBookmark.toString()));
 	}
 
 
