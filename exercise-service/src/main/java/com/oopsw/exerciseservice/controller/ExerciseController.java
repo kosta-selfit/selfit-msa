@@ -31,6 +31,7 @@ import com.oopsw.exerciseservice.vo.response.ResGetExercises;
 import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseAvgAll;
 import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResMessage;
+import com.oopsw.exerciseservice.vo.response.ResAddExercise;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
