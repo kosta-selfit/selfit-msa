@@ -16,7 +16,7 @@ public interface BoardService {
 
 	void removeBoard(BoardDto boardDto);
 
-	void toggleBookmark(BoardDto boardDto);
+	Boolean toggleBookmark(BoardDto boardDto);
 
 	// BoardDto getBoardTotal();
 }

@@ -33,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public List<CommentDto> getComments(String boardId, int page) {
-		Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "createdDate"));
+		Pageable pageable = PageRequest.of(page-1, 5, Sort.by(Sort.Direction.DESC, "createdDate"));
 		return commentRepository.findByBoardId(boardId, pageable)
 			.stream()
 			.map(commentEntity -> {
@@ -65,6 +65,8 @@ public class CommentServiceImpl implements CommentService {
 	public void addComment(CommentDto commentDto) {
 		CommentEntity commentEntity = modelMapper.map(commentDto, CommentEntity.class);
 		commentEntity.setCommentId(UUID.randomUUID().toString());
-		commentRepository.save(commentEntity);
+		if(commentDto.getMemberId() != null) {
+			commentRepository.save(commentEntity);
+		}
 	}
 }

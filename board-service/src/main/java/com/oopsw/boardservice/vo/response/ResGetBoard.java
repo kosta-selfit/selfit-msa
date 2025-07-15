@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ResGetBoard {
+	private String memberId;
 	private String boardTitle;
+	private String boardContent;
 	private String categoryName;
 	private String nickName;
 	private Date createdDate;

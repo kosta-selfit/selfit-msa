@@ -18,7 +18,9 @@ import com.oopsw.commentservie.vo.response.ResGetComments;
 import com.oopsw.commentservie.vo.response.ResMessage;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 
+@Log4j2
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/comment-service")
@@ -36,10 +38,12 @@ public class CommentController {
 		return ResponseEntity.ok(comments);
 	}
 
-	@PostMapping("/board/{boardId}/comment")
-	public ResponseEntity<ResMessage> addComment(@PathVariable String boardId, @RequestBody ReqAddComment reqAddComment) {
+	@PostMapping("/board/{boardId}/comment/member/{memberId}")
+	public ResponseEntity<ResMessage> addComment(@PathVariable String boardId,@PathVariable String memberId, @RequestBody ReqAddComment reqAddComment) {
 		CommentDto commentDto = modelMapper.map(reqAddComment, CommentDto.class);
 		commentDto.setBoardId(boardId);
+		commentDto.setMemberId(memberId);
+		System.out.println("잘나와? " + commentDto);
 		commentService.addComment(commentDto);
 		return ResponseEntity.ok(new ResMessage("success"));
 	}
