@@ -21,14 +21,18 @@ import com.oopsw.exerciseservice.vo.request.ReqAddExercise;
 import com.oopsw.exerciseservice.vo.request.ReqGetExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqGetExerciseOpenSearch;
 import com.oopsw.exerciseservice.vo.request.ReqGetExercises;
+import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseAvgAll;
 import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqRemoveExercise;
 import com.oopsw.exerciseservice.vo.request.ReqSetExerciseMin;
+import com.oopsw.exerciseservice.vo.response.ResAddExercise;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseOpenSearch;
 import com.oopsw.exerciseservice.vo.response.ResGetExercises;
+import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseAvgAll;
 import com.oopsw.exerciseservice.vo.response.ResGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResMessage;
+import com.oopsw.exerciseservice.vo.response.ResAddExercise;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -47,15 +51,15 @@ public class ExerciseController {
 	}
 
 	@PostMapping("/member/{memberId}")
-	public ResponseEntity<ResMessage> addExercise(@RequestBody ReqAddExercise reqAddExercise, @PathVariable String memberId) {
+	public ResponseEntity<ResAddExercise> addExercise(@RequestBody ReqAddExercise reqAddExercise, @PathVariable String memberId) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
 			.exerciseDate(reqAddExercise.getExerciseDate())
 			.exerciseMin(reqAddExercise.getExerciseMin())
 			.met(reqAddExercise.getMet())
 			.exerciseName(reqAddExercise.getExerciseName())
 			.memberId(memberId).build();
-		exerciseService.addExercise(exerciseDto);
-		return ResponseEntity.ok(new ResMessage("success"));
+		String exerciseId = exerciseService.addExercise(exerciseDto);
+		return ResponseEntity.ok(new ResAddExercise(exerciseId));
 	}
 
 	@PostMapping("/exercises/member/{memberId}")
@@ -68,6 +72,7 @@ public class ExerciseController {
 		List<ResGetExercises> resGetExercises = new ArrayList<>();
 		for (ExerciseDto exerciseDto1 : exerciseDtos) {
 			ResGetExercises resGetExercise = ResGetExercises.builder()
+				.exerciseId(exerciseDto1.getExerciseId())
 				.exerciseDate(exerciseDto1.getExerciseDate())
 				.exerciseKcal(exerciseDto1.getExerciseKcal())
 				.exerciseName(exerciseDto1.getExerciseName())
@@ -131,6 +136,25 @@ public class ExerciseController {
 		return ResponseEntity.ok(resGetYearExerciseKcals);
 	}
 
+	@PostMapping("/avg/year/member/{memberId}")
+	public ResponseEntity<List<ResGetYearExerciseAvgAll>> getYearExerciseAvgAll(@RequestBody ReqGetYearExerciseAvgAll reqGetYearExerciseAvgAll, @PathVariable String memberId) {
+		ExerciseDto exerciseDto = ExerciseDto.builder()
+			.memberId(memberId)
+			.year(reqGetYearExerciseAvgAll.getYear())
+			.build();
+
+		List<ExerciseDto> avgPerDate = exerciseService.getYearExerciseAvgAll(exerciseDto);
+
+		List<ResGetYearExerciseAvgAll> responseList = avgPerDate.stream()
+			.map(dto -> ResGetYearExerciseAvgAll.builder()
+				.exerciseDate(dto.getExerciseDate().toString())
+				.avgExerciseKcal(dto.getExerciseAvg())
+				.build())
+			.toList();
+
+		return ResponseEntity.ok(responseList);
+	}
+
 	@PostMapping("/open-search")
 	public ResponseEntity<Mono<List<ResGetExerciseOpenSearch>>> getExerciseOpenSearch(@RequestBody ReqGetExerciseOpenSearch reqGetExerciseOpenSearch) {
 		ExerciseDto exerciseDto = ExerciseDto.builder()
@@ -151,4 +175,6 @@ public class ExerciseController {
 		);
 		return ResponseEntity.ok(resGetExerciseOpenSearch);
 	}
+
+
 }

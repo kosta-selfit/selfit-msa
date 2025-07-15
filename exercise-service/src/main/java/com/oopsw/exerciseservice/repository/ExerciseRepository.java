@@ -16,5 +16,5 @@ public interface ExerciseRepository extends JpaRepository<ExerciseEntity, Long> 
 	Integer deleteByMemberIdAndExerciseId(String memberId, String exerciseId);
 	ExerciseEntity findByExerciseId(String exerciseId);
 	List<ExerciseEntity> findByMemberIdAndExerciseDateBetween(String memberId, LocalDate startDate, LocalDate endDate);
-
+	ExerciseEntity findByMemberIdAndExerciseId(String memberId, String exerciseId);
 }

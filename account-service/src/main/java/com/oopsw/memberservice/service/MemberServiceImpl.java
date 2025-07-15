@@ -1,11 +1,15 @@
 package com.oopsw.memberservice.service;
 
 import java.time.LocalDate;
+import java.time.MonthDay;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
+import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -64,8 +68,9 @@ public class MemberServiceImpl implements MemberService {
 			memberDto.setPw(passwordEncoder.encode(memberDto.getPw()));
 		}
 		memberDto.setBmr(calculateBmr(memberDto));
-
-		new ModelMapper().map(memberDto, memberEntity);
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+		modelMapper.map(memberDto, memberEntity);
 		memberEntity.setId(id);
 	}
 
@@ -111,7 +116,7 @@ public class MemberServiceImpl implements MemberService {
 		return bmr.floatValue();
 	}
 
-	private Integer getAge(MemberDto memberDto) {
+	public Integer getAge(MemberDto memberDto) {
 		LocalDate today = LocalDate.now();
 		Date birthday = memberDto.getBirthday();
 
@@ -122,6 +127,50 @@ public class MemberServiceImpl implements MemberService {
 		LocalDate birthdateLocal = birthday.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
 		return Period.between(birthdateLocal, today).getYears();
+	}
+
+	public List<MemberDto> getMemberLike(MemberDto memberDto) {
+		MemberEntity memberEntity = MemberEntity.builder().memberId(memberDto.getMemberId()).build();
+		MemberEntity myEntity = memberRepository.findByMemberId(memberEntity.getMemberId());
+
+		MemberDto myDto = MemberDto.builder().memberId(myEntity.getMemberId()).birthday(myEntity.getBirthday()).build();
+		int age = getAge(myDto);
+
+		int minAge = (age / 10) * 10;
+		int maxAge = minAge + 9;
+
+		int youngestYear = getBirthYearFromAge(minAge);
+		int oldestYear = getBirthYearFromAge(maxAge);
+
+		Date birthStart = Date.from(LocalDate.of(oldestYear, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant());
+		Date birthEnd = Date.from(LocalDate.of(youngestYear+1, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant().minusSeconds(1));
+
+		int heightMin = (int)((myEntity.getHeight() / 10) * 10);
+		int heightMax = heightMin + 9;
+
+		int weightMin = (int)((myEntity.getWeight() / 10) * 10);
+		int weightMax = weightMin + 9;
+
+		String goal = myEntity.getGoal();
+
+		List<MemberEntity> likeMembers = memberRepository.findByGoalAndBirthdayBetweenAndHeightBetweenAndWeightBetween(
+			goal, birthStart, birthEnd, heightMin, heightMax, weightMin, weightMax
+			);
+
+		List<MemberDto> list = new ArrayList<>();
+
+		for (MemberEntity likeMember : likeMembers) {
+			MemberDto memberinnerDto = MemberDto.builder().memberId(likeMember.getMemberId()).build();
+			list.add(memberinnerDto);
+		}
+		return list;
+	}
+
+	public static int getBirthYearFromAge(int age) {
+		LocalDate today = LocalDate.now();
+		int year = today.getYear() - age;
+
+		return year;
 	}
 
 }

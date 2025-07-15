@@ -1,24 +1,34 @@
 package com.oopsw.foodservice.service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import com.oopsw.foodservice.dto.FoodApiDto;
 import com.oopsw.foodservice.dto.FoodDto;
+import com.oopsw.foodservice.dto.MemberDto;
 import com.oopsw.foodservice.jpa.FoodEntity;
+import com.oopsw.foodservice.jpa.FoodTotalEntity;
 import com.oopsw.foodservice.repository.FoodApiRepository;
 import com.oopsw.foodservice.repository.FoodRepository;
+import com.oopsw.foodservice.repository.FoodTotalRepository;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -29,6 +39,9 @@ public class FoodServiceImpl implements FoodService {
 	private final FoodRepository foodRepository;
 	private final FoodApiRepository foodApiRepository;
 	private final ModelMapper modelMapper;
+	private final FoodTotalRepository foodTotalRepository;
+	private final RestTemplate restTemplate;
+	private final Environment environment;
 
 	@Override
 	public Mono<List<FoodApiDto>> getFoodByNameLike(FoodApiDto foodApiDto) {
@@ -95,6 +108,42 @@ public class FoodServiceImpl implements FoodService {
 		return foodDtoList;
 	}
 
+	public List<FoodDto> getYearIntakeAvgAll(FoodDto foodDto) {
+		String memberUrl = String.format(environment.getProperty("member-service.like.url"), foodDto.getMemberId());
+		ResponseEntity<List<MemberDto>> memberDto = restTemplate.exchange(memberUrl, HttpMethod.GET, null, new ParameterizedTypeReference<List<MemberDto>>() {  });
+		List<MemberDto> memberIds = memberDto.getBody();
+
+		Map<LocalDate, List<Float>> dateToKcalList = new TreeMap<>();
+
+		for(MemberDto member : memberIds) {
+			FoodDto perMemberDto = FoodDto.builder()
+				.year(foodDto.getYear())
+				.memberId(member.getMemberId())
+				.build();
+
+			List<FoodDto> oneMemberData = getYearIntakeKcal(perMemberDto);
+
+			for(FoodDto daily : oneMemberData) {
+				LocalDate localDate = daily.getIntakeDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+				dateToKcalList.computeIfAbsent(localDate, k -> new ArrayList<>())
+					.add(daily.getIntakeKcalSum());
+			}
+		}
+
+		List<FoodDto> resultDtos = dateToKcalList.entrySet().stream()
+			.map(entry -> {
+				LocalDate date = entry.getKey();
+				List<Float> kcals = entry.getValue();
+				float average = (float) kcals.stream().mapToDouble(Float::doubleValue).average().orElse(0.0);
+				return FoodDto.builder()
+					.intakeDateLocal(date)
+					.intakeAvg(average)
+					.build();
+			}).collect(Collectors.toList());
+
+		return resultDtos;
+	}
+
 	@Override
 	public List<FoodDto> getFood(FoodDto foodDto) {
 		List<FoodEntity> foodEntities = foodRepository.findByMemberIdAndIntakeDate(foodDto.getMemberId(), foodDto.getIntakeDate());
@@ -112,6 +161,29 @@ public class FoodServiceImpl implements FoodService {
 		foodEntity.setFoodId(UUID.randomUUID().toString());
 		foodEntity.setIntakeKcal(foodDto.getIntake()/100f*foodDto.getUnitKcal());
 		foodRepository.save(foodEntity);
+
+		LocalDate localDate = foodEntity.getIntakeDate().toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
+
+		if(foodTotalRepository.existsByMemberIdAndIntakeDate(foodEntity.getMemberId(), localDate)) {
+			FoodTotalEntity foodTotalEntity = foodTotalRepository.findByMemberIdAndIntakeDate(foodEntity.getMemberId(), localDate);
+			foodTotalEntity.setFoodTotalKcal(foodTotalEntity.getFoodTotalKcal() + foodEntity.getIntakeKcal());
+
+			foodTotalEntity.setIntakeDate(localDate);
+			foodTotalRepository.save(foodTotalEntity);
+		}
+		else {
+			FoodTotalEntity foodTotalEntity = FoodTotalEntity.builder()
+				.foodTotalId(UUID.randomUUID().toString())
+				.foodTotalKcal(foodDto.getIntake()/100f*foodDto.getUnitKcal())
+				.memberId(foodEntity.getMemberId())
+				.intakeDate(localDate)
+				.build();
+			foodTotalRepository.save(foodTotalEntity);
+		}
+
+
 		return foodDto;
 	}
 
@@ -119,24 +191,47 @@ public class FoodServiceImpl implements FoodService {
 	@Transactional
 	public FoodDto setFood(FoodDto foodDto) {
 		FoodEntity foodEntity = foodRepository.findByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
-
+		float beforeIntakekcal = foodEntity.getIntakeKcal();
 		if(foodEntity == null) {
 			throw new IllegalArgumentException("Invalid foodId");
 		}
 
+		float intakeKcal = foodDto.getIntake()/100f*foodEntity.getUnitKcal();
 		foodEntity.setIntake(foodDto.getIntake());
-		foodEntity.setIntakeKcal(foodDto.getIntake()/100f*foodEntity.getUnitKcal());
+		foodEntity.setIntakeKcal(intakeKcal);
 		foodRepository.save(foodEntity);
+
+		LocalDate localDate = foodEntity.getIntakeDate().toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
+
+		FoodTotalEntity foodTotalEntity = FoodTotalEntity.builder()
+			.memberId(foodDto.getMemberId())
+			.intakeDate(localDate)
+			.build();
+
+		FoodTotalEntity foodTotalEntityafter = foodTotalRepository.findByMemberIdAndIntakeDate(foodTotalEntity.getMemberId(), foodTotalEntity.getIntakeDate());
+		foodTotalEntityafter.setFoodTotalKcal(foodTotalEntityafter.getFoodTotalKcal() + (intakeKcal - beforeIntakekcal));
+		foodTotalRepository.save(foodTotalEntityafter);
 		return foodDto;
 	}
 
 	@Override
 	@Transactional
 	public void removeFood(FoodDto foodDto) {
+		FoodEntity foodEntityDateIntakeKcal = foodRepository.findByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
+		LocalDate localDate = foodEntityDateIntakeKcal.getIntakeDate().toInstant()
+			.atZone(ZoneId.systemDefault())
+			.toLocalDate();
+		FoodTotalEntity foodTotalEntity = foodTotalRepository.findByMemberIdAndIntakeDate(foodDto.getMemberId(), localDate);
+
 		int foodEntity = foodRepository.deleteByMemberIdAndFoodId(foodDto.getMemberId(), foodDto.getFoodId());
+		foodTotalEntity.setFoodTotalKcal(foodTotalEntity.getFoodTotalKcal()-foodEntityDateIntakeKcal.getIntakeKcal());
+		foodTotalRepository.save(foodTotalEntity);
 
 		if(foodEntity == 0) {
 			throw new IllegalArgumentException("Invalid memberId or foodId");
 		}
+
 	}
 }
