@@ -25,6 +25,7 @@ import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseAvgAll;
 import com.oopsw.exerciseservice.vo.request.ReqGetYearExerciseKcal;
 import com.oopsw.exerciseservice.vo.request.ReqRemoveExercise;
 import com.oopsw.exerciseservice.vo.request.ReqSetExerciseMin;
+import com.oopsw.exerciseservice.vo.response.ResAddExercise;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseKcal;
 import com.oopsw.exerciseservice.vo.response.ResGetExerciseOpenSearch;
 import com.oopsw.exerciseservice.vo.response.ResGetExercises;
