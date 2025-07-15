@@ -69,7 +69,7 @@ public class BoardController {
 		return ResponseEntity.ok(resGetBoard);
 	}
 
-	@GetMapping("/bookmark/{page}")
+	@GetMapping("/bookmark/{page}/member/{memberId}")
 	public ResponseEntity<List<ResBookmarks>> getBookmarks(@PathVariable int page, @PathVariable String memberId){
 
 		log.info("getBookmarks - page: {}, memberId: {}", page, memberId);
