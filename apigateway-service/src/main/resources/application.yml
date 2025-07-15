@@ -25,6 +25,13 @@ spring:
           - id: board-service
             uri: lb://board-service
             predicates:
+              - Path=/api/board-service/list
+              - Method=GET
+            filters:
+              - RemoveRequestHeader=Cookie
+          - id: board-service
+            uri: lb://board-service
+            predicates:
               - Path=/api/board-service/**
             filters:
               - AuthorizationHeaderFilter
