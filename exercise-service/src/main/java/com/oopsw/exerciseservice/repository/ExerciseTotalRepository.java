@@ -10,4 +10,5 @@ public interface ExerciseTotalRepository extends JpaRepository<ExerciseTotalEnti
 
 	boolean existsByMemberIdAndExerciseDate(String memberId, LocalDate exerciseDate);
 	ExerciseTotalEntity findByMemberIdAndExerciseDate(String memberId, LocalDate exerciseDate);
+	ExerciseTotalEntity findByExerciseDateAndMemberId(LocalDate exerciseDate, String memberId);
 }
