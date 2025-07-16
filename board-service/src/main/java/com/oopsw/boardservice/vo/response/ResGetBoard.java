@@ -17,6 +17,7 @@ public class ResGetBoard {
 	private String boardContent;
 	private String categoryName;
 	private String nickName;
+	private String boardImg;
 	private Date createdDate;
 	private int commentCount;
 	private int viewCount;
