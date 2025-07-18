@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		refreshTokenService.saveRefreshToken(refreshToken, authenticatedUser.getMemberId());
 		addRefreshTokenCookie(response, refreshToken);
 
-		response.getWriter().println(Map.of("message", "login_ok"));
+		response.getWriter().println(Map.of("message", "success"));
 
 	}
 
@@ -87,7 +87,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 		AuthenticationException failed) throws IOException, ServletException {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		response.getWriter().println(Map.of("message", "login_fail"));
+		response.getWriter().println(Map.of("message", "fail"));
 	}
 
 	private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {

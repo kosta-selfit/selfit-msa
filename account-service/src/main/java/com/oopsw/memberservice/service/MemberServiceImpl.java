@@ -31,7 +31,12 @@ public class MemberServiceImpl implements MemberService {
 	@Override
 	public void addMember(MemberDto memberDto) {
 		memberDto.setMemberId(UUID.randomUUID().toString());
-		memberDto.setPw(passwordEncoder.encode(memberDto.getPw()));
+
+		if (memberDto.getMemberType().equals("DEFAULT")) {
+			memberDto.setPw(passwordEncoder.encode(memberDto.getPw()));
+		} else {
+			memberDto.setPw(passwordEncoder.encode(UUID.randomUUID().toString()));
+		}
 		memberDto.setBmr(calculateBmr(memberDto));
 
 		memberRepository.save(new ModelMapper().map(memberDto, MemberEntity.class));
