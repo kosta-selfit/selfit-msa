@@ -76,7 +76,7 @@ public class BoardServiceImpl implements BoardService {
 
 	@Override
 	public List<BoardDto> getBoards(int page, String categoryName, String sortOrder, String keyword) {
-		int pageSize = 5;
+		int pageSize = 10;
 
 		Sort.Direction dir = "asc".equalsIgnoreCase(sortOrder)
 			? Sort.Direction.ASC
@@ -118,6 +118,7 @@ public class BoardServiceImpl implements BoardService {
 				return boardDto;
 			})
 			.collect(Collectors.toList());
+		System.out.println("id확인 : "+boardDtoList.get(0));
 		return boardDtoList;
 	}
 
@@ -172,7 +173,7 @@ public class BoardServiceImpl implements BoardService {
 	}
 
 	@Override
-	public void toggleBookmark(BoardDto boardDto) {
+	public Boolean toggleBookmark(BoardDto boardDto) {
 		if (boardDto.getMemberId() == null) {
 			throw new IllegalArgumentException("로그인을 해주세요.");
 		}
@@ -182,8 +183,10 @@ public class BoardServiceImpl implements BoardService {
 
 		if (bookmarkEntity != null) {
 			bookmarkRepository.delete(bookmarkEntity);
+			return true;
 		} else {
 			bookmarkRepository.save(modelMapper.map(boardDto, BookmarkEntity.class));
+			return false;
 		}
 	}
 }

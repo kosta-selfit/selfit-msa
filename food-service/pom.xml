@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.oopsw</groupId>
     <artifactId>food-service</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>food-service</name>
     <description>food-service</description>
     <url/>

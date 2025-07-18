@@ -58,6 +58,13 @@ spring:
           - id: board-service
             uri: lb://board-service
             predicates:
+              - Path=/api/board-service/list
+              - Method=GET
+            filters:
+              - RemoveRequestHeader=Cookie
+          - id: board-service
+            uri: lb://board-service
+            predicates:
               - Path=/api/board-service/**
             filters:
               - AuthorizationHeaderFilter
@@ -100,7 +107,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://127.0.0.1:8761/eureka
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://discovery-service:8761/eureka}
 
 shop:
   message: E-shop

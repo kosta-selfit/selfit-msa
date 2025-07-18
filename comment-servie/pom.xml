@@ -10,9 +10,9 @@
     </parent>
     <groupId>com.oopsw</groupId>
     <artifactId>comment-servie</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>comment-servie</name>
-    <description>comment-servie</description>
+    <version>1.0</version>
+    <name>comment-service</name>
+    <description>comment-service</description>
     <url/>
     <licenses>
         <license/>

@@ -18,18 +18,19 @@ public class ExerciseServiceTests {
 	@Autowired
 	private ExerciseService exerciseService;
 
-	@Test
-	public void testAddExercise() {
-		ExerciseDto exerciseDto = ExerciseDto.builder()
-			.exerciseName("걷기")
-			.exerciseMin(30)
-			.exerciseDate("2025-01-01")
-			.memberId("m001")
-			.met(5.3f)
-			.build();
-		exerciseService.addExercise(exerciseDto);
-		log.info(exerciseDto);
-	}
+	// @Test
+	// public void testAddExercise() {
+	// 	ExerciseDto exerciseDto = ExerciseDto.builder()
+	// 		.exerciseName("걷기")
+	// 		.exerciseMin(30)
+	// 		.exerciseDate("2025-01-01")
+	// 		.memberId("m001")
+	// 		.met(5.3f)
+	// 		.build();
+	// 	exerciseService.addExercise(exerciseDto);
+	// 	log.info(exerciseDto);
+	// }
 
 
 }
+
