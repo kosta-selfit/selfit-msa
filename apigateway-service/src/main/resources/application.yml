@@ -8,6 +8,22 @@ spring:
   cloud:
     gateway.server.webflux:
       routes:
+
+          - id: member-service
+            uri: lb://member-service
+            predicates:
+              - Path=/oauth2/authorization/**
+
+          - id: member-service
+            uri: lb://member-service
+            predicates:
+              - Path=/login/oauth2/code/**
+
+          - id: member-service
+            uri: lb://member-service
+            predicates:
+              - Path=/login/oauth2/**
+
           - id: member-service
             uri: lb://member-service
             predicates:
@@ -21,6 +37,13 @@ spring:
             predicates:
               - Path=/api/member-service/member/**
               - Method=POST
+            filters:
+              - RemoveRequestHeader=Cookie
+
+          - id: member-service
+            uri: lb://member-service
+            predicates:
+              - Path=/api/member-service/**
             filters:
               - RemoveRequestHeader=Cookie
 

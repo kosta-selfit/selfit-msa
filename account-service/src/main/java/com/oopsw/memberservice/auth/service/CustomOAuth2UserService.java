@@ -31,7 +31,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
 	public CustomOAuth2User convertToCustomOAuth2User(Map<String, Object> attributes) {
 		String email = (String)attributes.get("email");
-
 		//회원가입 이력이 없는 경우 회원가입페이지로 유도
 		if (!memberService.checkEmail(MemberDto.builder().email(email).build())) {
 			RequestContextHolder.currentRequestAttributes()
