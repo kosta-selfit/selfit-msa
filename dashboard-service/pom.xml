@@ -34,10 +34,12 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-tracing-bridge-zipkin</artifactId>
+			<version>1.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>io.zipkin.reporter2</groupId>
 			<artifactId>zipkin-reporter-brave</artifactId>
+			<version>2.16.4</version>
 		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
