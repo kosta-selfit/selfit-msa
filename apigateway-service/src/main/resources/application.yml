@@ -5,6 +5,12 @@ spring:
   application:
     name: apigateway-service
 
+  zipkin:
+    base-url: http://zipkin:9411
+  sleuth:
+    sampler:
+      probability: 1.0
+
   cloud:
     gateway.server.webflux:
       routes:
