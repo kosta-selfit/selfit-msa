@@ -139,3 +139,10 @@ services:
       DB_PASSWORD: mypassword
     networks: [msa-net]
     restart: unless-stopped
+
+  zipkin:
+    image: openzipkin/zipkin:latest
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    networks: [ msa-net ]
