@@ -1,0 +1,141 @@
+########################  공통 네트워크  ########################
+networks:
+  msa-net:
+    driver: bridge
+
+########################  서비스 정의  ########################
+services:
+
+  # 1) Eureka (Discovery)
+  discovery-service:
+    image: yapyapboo/discovery-service:1.0
+    container_name: discovery-service
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    networks: [msa-net]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # 2) API Gateway
+  apigateway-service:
+    image: yapyapboo/apigateway-service:1.0
+    container_name: apigateway-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery-service:8761/eureka
+    networks: [msa-net]
+    restart: unless-stopped
+
+  # 3) Member(Account) Service
+  member-service:
+    image: yapyapboo/member-service:1.0
+    container_name: member-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery-service:8761/eureka
+      DB_IP: 34.47.102.46
+      DB_NAME: selfit
+      DB_USERNAME: kosta
+      DB_PASSWORD: hr7292
+      GOOGLE_ID: 1063644905699-fvf909nphpb5h4c52b8hp7diuq0fciee.apps.googleusercontent.com
+      GOOGLE_SECRET: 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
+      FOODAPI_KEY: Gngvp3UKvhulX6Jks8LsIebA534zldKcl1z7nB5IY7GLCTi91UO4BmwWutMo0zLFPMNFltzHI7Ab3uL1IoVt/g==
+      EXERCISE_KEY: Gngvp3UKvhulX6Jks8LsIebA534zldKcl1z7nB5IY7GLCTi91UO4BmwWutMo0zLFPMNFltzHI7Ab3uL1IoVt/g==
+    networks: [msa-net]
+    restart: unless-stopped
+
+  # 4) Board Service
+  board-service:
+    image: yapyapboo/board-service:1.0
+    container_name: board-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery-service:8761/eureka
+      DB_IP: 34.22.88.109
+      DB_NAME: mydb
+      DB_USERNAME: username
+      DB_PASSWORD: password
+    networks: [msa-net]
+    restart: unless-stopped
+
+  # 5) Comment Service
+  comment-service:
+    image: yapyapboo/comment-service:1.0
+    container_name: comment-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery-service:8761/eureka
+      DB_IP: 34.47.97.37
+      DB_NAME: mydb
+      DB_USERNAME: username
+      DB_PASSWORD: password
+    networks: [msa-net]
+    restart: unless-stopped
+
+  # 6) Food Service
+  food-service:
+    image: yapyapboo/food-service:1.0
+    container_name: food-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery-service:8761/eureka
+      DB_IP: 34.64.251.29
+      DB_NAME: mydb
+      DB_USERNAME: username
+      DB_PASSWORD: password
+      FOODAPI_KEY: Gngvp3UKvhulX6Jks8LsIebA534zldKcl1z7nB5IY7GLCTi91UO4BmwWutMo0zLFPMNFltzHI7Ab3uL1IoVt/g==
+    networks: [msa-net]
+    restart: unless-stopped
+
+  # 7) Exercise Service
+  exercise-service:
+    image: yapyapboo/exercise-service:1.0
+    container_name: exercise-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery-service:8761/eureka
+    networks: [msa-net]
+    restart: unless-stopped
+
+  # 8) Checklist Service
+  checklist-service:
+    image: yapyapboo/checklist-service:1.0
+    container_name: checklist-service
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://discovery-service:8761/eureka 
+      DB_IP: 34.64.40.156
+      DB_NAME: mydb
+      DB_USERNAME: myuser
+      DB_PASSWORD: mypassword
+    networks: [msa-net]
+    restart: unless-stopped
