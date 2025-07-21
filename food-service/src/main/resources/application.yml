@@ -32,11 +32,6 @@ spring:
       hibernate:
         format_sql: true
 
-  zipkin:
-    base-url: http://zipkin:9411
-  sleuth:
-    sampler:
-      probability: 1.0
 
 eureka:
   instance:
@@ -46,6 +41,15 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://discovery-service:8761/eureka}
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+    enabled: true
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411/api/v2/spans
 
 shop:
   message: E-shop
